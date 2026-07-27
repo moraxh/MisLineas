@@ -1,8 +1,10 @@
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import type { LineResult } from "@/types";
 
 export async function lookupCURPInMegamovil(curp: string): Promise<LineResult> {
   const sessionResponse = await fetch(
     "https://consultavinculacion.megamovil.mx",
+    { signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS) },
   );
 
   if (!sessionResponse.ok) {
@@ -17,7 +19,10 @@ export async function lookupCURPInMegamovil(curp: string): Promise<LineResult> {
 
   const validationResponse = await fetch(
     `https://consultavinculacion.megamovil.mx/validaCURP?curp=${curp}`,
-    { headers: { Cookie: cookies } },
+    {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
+      headers: { Cookie: cookies },
+    },
   );
 
   if (!validationResponse.ok) {

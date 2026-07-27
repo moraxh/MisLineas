@@ -1,3 +1,4 @@
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import crypto from "node:crypto";
 import type { LineResult } from "@/types";
 import { solveCapChallenge } from "./solver";
@@ -74,6 +75,7 @@ export async function lookupCURPInAltanMVNO(curp: string): Promise<LineResult> {
   const challengeResponse = await fetch(
     "https://rnu.altanredes.com/api/mx/captcha/a92a56476f/challenge",
     {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
       referrer: "https://rnu.altanredes.com/consulta",
       method: "POST",
       headers: {
@@ -106,6 +108,7 @@ export async function lookupCURPInAltanMVNO(curp: string): Promise<LineResult> {
   const redeemResponse = await fetch(
     "https://rnu.altanredes.com/api/mx/captcha/a92a56476f/redeem",
     {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
       method: "POST",
       headers: {
         accept: "*/*",
@@ -188,6 +191,7 @@ export async function lookupCURPInAltanMVNO(curp: string): Promise<LineResult> {
   const url = `https://rnu.altanredes.com/_serverFn/be0aebbc40b7f89dcde6ed49a1fdaffb199dd02f87e1de771662e51d6e55c421?payload=${encodeURIComponent(JSON.stringify(validationParams))}`;
 
   const validationResponse = await fetch(url, {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     headers: {
       accept:
         "application/x-tss-framed, application/x-ndjson, application/json",

@@ -1,3 +1,4 @@
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import { ProxyAgent, fetch as undiciFetch } from "undici";
 import { getResidentialProxyUrl } from "@/lib/proxy";
 import { stripCURPs } from "@/lib/sanitize";
@@ -11,7 +12,10 @@ export async function loookupCURPInTalentoNetMVNO(
   const proxyUrl = getResidentialProxyUrl();
   const validationResponse = await undiciFetch(
     `https://core.newww.mx/api/core/consulta_lineas_vinculacion?curp=${curp}`,
-    { dispatcher: proxyUrl ? new ProxyAgent(proxyUrl) : undefined },
+    {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
+      dispatcher: proxyUrl ? new ProxyAgent(proxyUrl) : undefined,
+    },
   );
 
   if (validationResponse.status === 404) {

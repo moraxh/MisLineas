@@ -1,3 +1,4 @@
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import type { LineResult } from "@/types";
 
 export async function lookupCURPInSorcel(curp: string): Promise<LineResult> {
@@ -7,6 +8,7 @@ export async function lookupCURPInSorcel(curp: string): Promise<LineResult> {
   const validationResponse = await fetch(
     "https://www.soriup.mx/consultaR.asp",
     {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
       method: "POST",
       body: vallidationFormData,
     },

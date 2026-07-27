@@ -1,3 +1,4 @@
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import type { LineResult } from "@/types";
 
 export async function loookupCURPInVirginMobile(
@@ -11,6 +12,7 @@ export async function loookupCURPInVirginMobile(
   const validationResponse = await fetch(
     "https://www.virginmobile.mx/api/v1/public/consulta-linea/findMsisdn",
     {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -1,3 +1,4 @@
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import { stripCURPs } from "@/lib/sanitize";
 import type { LineResult } from "@/types";
 
@@ -6,6 +7,7 @@ export async function lookupCURPInBeneleit(
 ): Promise<LineResult> {
   const validationResponse = await fetch(
     `https://core.beneleit.talentonet.com/api/core/consulta_lineas_vinculacion?curp=${curp}`,
+    { signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS) },
   );
 
   if (validationResponse.status === 404) {

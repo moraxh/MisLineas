@@ -1,3 +1,4 @@
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import { stripCURPs } from "@/lib/sanitize";
 import type { LineResult } from "@/types";
 
@@ -18,6 +19,7 @@ export async function lookupCURPInDialo(curp: string): Promise<LineResult> {
   const validationResponse = await fetch(
     "https://p737drx1pj.execute-api.us-east-1.amazonaws.com/prod/gestion-lineas",
     {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
       method: "POST",
       headers: validationHeaders,
       body: JSON.stringify(validationBody),

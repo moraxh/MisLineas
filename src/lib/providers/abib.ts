@@ -1,9 +1,11 @@
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import { stripCURPs } from "@/lib/sanitize";
 import type { LineResult } from "@/types";
 
 export async function lookupCURPInABIB(curp: string): Promise<LineResult> {
   const validationResponse = await fetch(
     `https://erp.abib.com.mx/api/lineas/${curp}`,
+    { signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS) },
   );
 
   if (!validationResponse.ok) {

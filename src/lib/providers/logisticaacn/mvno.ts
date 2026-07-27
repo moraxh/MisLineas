@@ -1,3 +1,4 @@
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import type { LineResult } from "@/types";
 
 const possibleProviders = ["FedeGo!", "Flash Mobile", "Dua"];
@@ -7,6 +8,7 @@ export async function lookupCURPInLogisticaACN(
 ): Promise<LineResult> {
   const validationResponse = await fetch(
     `https://ku.diri.mx/consultaRNU/${curp}`,
+    { signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS) },
   );
 
   if (!validationResponse.ok) {

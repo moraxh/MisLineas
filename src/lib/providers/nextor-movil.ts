@@ -1,3 +1,4 @@
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import { stripCURPs } from "@/lib/sanitize";
 import type { LineResult } from "@/types";
 
@@ -7,6 +8,7 @@ export async function lookupCURPINNextorMovil(
   const authResponse = await fetch(
     "https://vinculacion.nextormovil.mx/api/consulta/iniciar",
     {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
       method: "POST",
     },
   );
@@ -49,6 +51,7 @@ export async function lookupCURPINNextorMovil(
   const validationResponse = await fetch(
     "https://vinculacion.nextormovil.mx/api/consulta/pre-check",
     {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
       method: "POST",
       headers: validationHeaders,
       body: JSON.stringify(validationBody),

@@ -1,3 +1,4 @@
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import { stripCURPs } from "@/lib/sanitize";
 import type { LineResult } from "@/types";
 
@@ -8,6 +9,7 @@ export async function lookupCURPInIENTC(curp: string): Promise<LineResult> {
   const authResponse = await fetch(
     "https://api-iso-prod.ientc.dev/auth/jwt/token",
     {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
       method: "POST",
       headers: {
         Authorization: `Basic N3U4ZThyNjF0OGwwbnRmZ3I5dmozaWhpN2U6a3FvYzNoYzIyZW9nYmVlazdyZWVzNnZqMW81cHFhMzlxcjg4aWVmZ3A3YTRudjd1aXFx`,
@@ -35,6 +37,7 @@ export async function lookupCURPInIENTC(curp: string): Promise<LineResult> {
   const validationResponse = await fetch(
     `https://api-iso-prod.ientc.dev/vinculacion/number/get-phones?curp=${curp}`,
     {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },

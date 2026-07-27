@@ -1,3 +1,4 @@
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import { createCipheriv } from "node:crypto";
 import { ProxyAgent, fetch as undiciFetch } from "undici";
 import { getResidentialProxyUrl } from "@/lib/proxy";
@@ -56,6 +57,7 @@ async function fetchSubscriptions(
     "https://vinculatulinea.com/omv-lineas/v1/omv-services/subscriptions-by-curp?pathName=freedompop&apiName=getSubscriptionsbyCURP";
   const auth = Buffer.from("admin:admin123").toString("base64");
   const response = await undiciFetch(url, {
+      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     method: "GET",
     dispatcher: getProxyAgent(),
     headers: {
