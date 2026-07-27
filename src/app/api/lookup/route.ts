@@ -24,6 +24,24 @@ import { checkRateLimit } from "@/lib/rate-limit";
 import { stripCURPs } from "@/lib/sanitize";
 import type { LineResult } from "@/types";
 
+// Firing every provider at once means a dozen simultaneous name resolutions —
+// each host needs both an A and an AAAA record. Under that burst a resolver can
+// start answering ENOTFOUND / EAI_AGAIN for hosts that are perfectly reachable:
+// a "not right now" indistinguishable from "no such host". Capping how many
+// lookups are in flight keeps it out of that state. Raise it if your resolver
+// copes fine — the results still stream in as each provider settles.
+const LOOKUP_CONCURRENCY = 5;
+
+// Retry only failures a warm cache fixes. Deliberately NOT timeouts: a request
+// that already spent its full budget is saturation or a dead socket, never a
+// name-resolution hiccup, and retrying it twice turns one slow lookup into a
+// multi-minute one.
+const TRANSIENT_ERROR = /fetch failed|ENOTFOUND|EAI_AGAIN/i;
+const MAX_RETRIES = 2;
+const RETRY_BASE_DELAY_MS = 300;
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 const providers: Array<{
   provider: string;
   lookupFunction: (curp: string) => Promise<LineResult | LineResult[]>;
@@ -149,55 +167,67 @@ export async function POST(req: NextRequest) {
     async start(controller) {
       const encoder = new TextEncoder();
 
-      const promises = providers.map((p) =>
-        p
-          .lookupFunction(curp)
-          .then(
-            (result) => {
-              const results = Array.isArray(result) ? result : [result];
-              return results.map((r) => ({ provider: p.provider, result: r }));
-            },
-            (error) => {
-              console.error(`Lookup failed for ${p.provider}:`, error);
-              return [
-                {
-                  provider: p.provider,
-                  result: {
-                    company: p.provider,
-                    lines: [],
-                    error: `Lookup failed: ${error.message}`,
-                  },
-                },
-              ];
-            },
-          )
-          .catch((error) => {
-            console.error(
-              `Unexpected error looking up CURP in ${p.provider}:`,
-              error,
+      const lookupWithRetry = async (p: (typeof providers)[number]) => {
+        for (let attempt = 0; ; attempt += 1) {
+          try {
+            const result = await p.lookupFunction(curp);
+            const results = Array.isArray(result) ? result : [result];
+
+            // A transient network failure usually comes back as a populated
+            // `error` field rather than a throw, so it has to be caught here too.
+            const transient = results.some(
+              (r) => r?.error && TRANSIENT_ERROR.test(r.error),
             );
+            if (transient && attempt < MAX_RETRIES) {
+              await sleep(RETRY_BASE_DELAY_MS * (attempt + 1));
+              continue;
+            }
+
+            return results.map((r) => ({ provider: p.provider, result: r }));
+          } catch (error) {
+            const message =
+              error instanceof Error ? error.message : "Unknown error";
+
+            if (TRANSIENT_ERROR.test(message) && attempt < MAX_RETRIES) {
+              await sleep(RETRY_BASE_DELAY_MS * (attempt + 1));
+              continue;
+            }
+
+            console.error(`Lookup failed for ${p.provider}:`, error);
             return [
               {
                 provider: p.provider,
                 result: {
                   company: p.provider,
                   lines: [],
-                  error: "An unexpected error occurred during lookup",
+                  error: `Lookup failed: ${message}`,
                 },
               },
             ];
-          })
-          .then((responses) => {
-            for (const response of responses) {
-              const sanitized = stripCURPs(response);
-              controller.enqueue(
-                encoder.encode(`${JSON.stringify(sanitized)}\n`),
-              );
-            }
-          }),
-      );
+          }
+        }
+      };
 
-      await Promise.allSettled(promises);
+      const queue = [...providers];
+      const worker = async () => {
+        for (;;) {
+          const p = queue.shift();
+          if (!p) return;
+
+          for (const response of await lookupWithRetry(p)) {
+            controller.enqueue(
+              encoder.encode(`${JSON.stringify(stripCURPs(response))}\n`),
+            );
+          }
+        }
+      };
+
+      await Promise.all(
+        Array.from(
+          { length: Math.min(LOOKUP_CONCURRENCY, providers.length) },
+          worker,
+        ),
+      );
       controller.close();
     },
   });

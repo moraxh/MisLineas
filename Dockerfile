@@ -23,6 +23,10 @@ FROM node:24-bookworm-slim AS production
 
 ENV NODE_ENV=production
 ENV CHROME_PATH=/usr/bin/chromium
+# getaddrinfo() runs on libuv's thread pool, which defaults to 4 threads. A
+# lookup resolves a dozen carrier hosts at once, so name resolution would queue
+# four at a time behind itself before a single request leaves the process.
+ENV UV_THREADPOOL_SIZE=64
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     chromium \
