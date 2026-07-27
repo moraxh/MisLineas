@@ -101,7 +101,7 @@ export async function lookupCURPInAltanMVNO(curp: string): Promise<LineResult> {
   }
 
   const challengeData = await challengeResponse.json();
-  const solution = solveCapChallenge(challengeData);
+  const solution = await solveCapChallenge(challengeData);
 
   const redeemResponse = await fetch(
     "https://rnu.altanredes.com/api/mx/captcha/a92a56476f/redeem",
