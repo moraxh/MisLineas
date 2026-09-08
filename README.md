@@ -139,5 +139,6 @@ Gracias a quienes han contribuido con código, ideas o reportes que mejoraron el
 - [Hadassah García](https://github.com/HadassahGarcia)
 - [Carlos Núñez](https://github.com/CarlosNunezMX) — soporte completo para MegaMovil
 - [Milo Jarow](https://github.com/milojarow) — fix de bloqueo del event loop en el solver de Red Altán
+- [Gerardo Pacheco Bautista](https://github.com/pachedev) — fixes de falsos negativos y estabilidad en Weex y Nextor Movil
 
 Si contribuiste y no apareces aquí, abre un PR o dime y te agrego.
