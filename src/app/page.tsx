@@ -1,171 +1,69 @@
-"use client";
-
-import { AlertTriangle, ArrowUpRight } from "lucide-react";
-import { AnimatePresence } from "motion/react";
-import type React from "react";
-import { useState } from "react";
-import { AccordionItem } from "@/components/home/AccordionItem";
-import { ArcoSection } from "@/components/home/ArcoSection";
-import { CurpForm } from "@/components/home/CurpForm";
-import { EmptyState } from "@/components/home/EmptyState";
+import { Ban, Bot, DollarSign, PauseCircle } from "lucide-react";
 import { Footer } from "@/components/home/Footer";
-import { Hero } from "@/components/home/Hero";
 import { Navbar } from "@/components/home/Navbar";
-import { Notices } from "@/components/home/Notices";
-import { OperatorsSection } from "@/components/home/OperatorsSection";
-import { ResultsPanel } from "@/components/home/ResultsPanel";
-import { SecuritySection } from "@/components/home/SecuritySection";
-import { WhySection } from "@/components/home/WhySection";
-import { ReportDialog } from "@/components/ui/ReportDialog";
-import { getCurpValidationError } from "@/lib/curp";
-import { useCurpHistory } from "@/lib/hooks/useCurpHistory";
-import { useLookup } from "@/lib/hooks/useLookup";
 
 export default function MisLineas() {
-  const [curp, setCurp] = useState("");
-  const [reportTarget, setReportTarget] = useState<string | null>(null);
-  const { history, saveToHistory } = useCurpHistory();
-  const {
-    loading,
-    timedOut,
-    error,
-    results,
-    queryTime,
-    scannedCount,
-    liveMessage,
-    consultar,
-    retry,
-    reset,
-  } = useLookup(saveToHistory);
-
-  const curpValidationError = getCurpValidationError(curp);
-  const curpIsValid = curp.length === 18 && !curpValidationError;
-
-  const handleConsultar = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!curpIsValid) return;
-    consultar(curp);
-  };
-
-  const handleNuevaConsulta = () => {
-    reset();
-    setCurp("");
-  };
-
-  const handleSelectHistory = (h: string) => {
-    reset();
-    setCurp(h);
-  };
-
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fafaf9_0%,#f4f4f5_42%,#ffffff_100%)] font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white">
-      <div className="border-b border-red-800 bg-red-600 px-4 py-2.5 text-sm text-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-center gap-2.5">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-white" />
-          <p className="line-clamp-2 text-center sm:line-clamp-1">
-            <strong>Aviso Sorcel:</strong> un bloqueo de bots del proveedor
-            causó falsos positivos (líneas marcadas como registradas sin
-            estarlo). Ya quedó corregido.{" "}
-            <a
-              href="https://www.soriup.mx/consultavinculacion.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-semibold underline decoration-white/60 underline-offset-2 hover:text-red-100"
-            >
-              Verificar directamente <ArrowUpRight className="h-3.5 w-3.5" />
-            </a>
-          </p>
-        </div>
-      </div>
-
-      <div className="border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-sm text-amber-950">
-        <div className="mx-auto flex max-w-6xl items-center justify-center gap-2.5">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600" />
-          <p className="line-clamp-2 text-center sm:line-clamp-1">
-            <strong>Aviso Telcel:</strong> algunas líneas pueden no aparecer
-            aunque ya estén registradas.{" "}
-            <a
-              href="https://registro.telcel.com/vinculatulinea/#/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-semibold underline decoration-amber-400 underline-offset-2 hover:text-amber-700"
-            >
-              Revisar vinculación <ArrowUpRight className="h-3.5 w-3.5" />
-            </a>
-          </p>
-        </div>
-      </div>
-
-      <div aria-live="polite" aria-atomic="true" className="sr-only">
-        {liveMessage}
-      </div>
-
-      <AnimatePresence>
-        {reportTarget && (
-          <ReportDialog
-            operadora={reportTarget}
-            onClose={() => setReportTarget(null)}
-          />
-        )}
-      </AnimatePresence>
-
       <Navbar />
 
       <main
         id="contenido"
-        className="mx-auto max-w-5xl px-4 py-8 sm:px-6 md:py-12"
+        className="mx-auto max-w-3xl px-4 py-16 sm:px-6 md:py-24"
       >
-        <section className="mx-auto max-w-3xl space-y-6">
-          <Hero />
-          <CurpForm
-            curp={curp}
-            setCurp={setCurp}
-            loading={loading}
-            error={error}
-            timedOut={timedOut}
-            history={history}
-            onSubmit={handleConsultar}
-            onRetry={retry}
-            onSelectHistory={handleSelectHistory}
-          />
-          <Notices />
-        </section>
-
-        <section className="mt-10" aria-label="Resultados de la consulta">
-          <AnimatePresence mode="wait">
-            {!results && !loading && !timedOut ? (
-              <EmptyState />
-            ) : results !== null ? (
-              <ResultsPanel
-                results={results}
-                curp={curp}
-                loading={loading}
-                scannedCount={scannedCount}
-                queryTime={queryTime}
-                onNuevaConsulta={handleNuevaConsulta}
-                onReport={setReportTarget}
-              />
-            ) : null}
-          </AnimatePresence>
-        </section>
-
-        <div className="mt-16 space-y-12 md:mt-20">
-          <OperatorsSection />
-
-          <div className="mx-auto max-w-4xl space-y-4">
-            <h2 className="mb-6 px-2 text-center text-xl font-bold text-zinc-900 md:text-left">
-              Centro de Información
-            </h2>
-            <AccordionItem title="¿Por qué usar MisLíneas y cómo funciona?">
-              <WhySection />
-            </AccordionItem>
-            <AccordionItem id="seguridad" title="Seguridad y Privacidad">
-              <SecuritySection />
-            </AccordionItem>
-            <AccordionItem id="arco" title="Derechos ARCO y Denuncias">
-              <ArcoSection />
-            </AccordionItem>
+        <div className="flex flex-col items-center gap-6 rounded-2xl border border-zinc-200 bg-white p-8 text-center shadow-sm md:p-12">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-red-50">
+            <PauseCircle className="h-7 w-7 text-red-600" />
           </div>
+
+          <h1 className="text-2xl font-bold tracking-tight text-zinc-900 md:text-3xl">
+            MisLíneas está pausado temporalmente
+          </h1>
+
+          <p className="max-w-xl text-balance text-zinc-600">
+            Hemos decidido detener el servicio de forma temporal, hasta
+            encontrar una forma de mitigar los siguientes problemas:
+          </p>
+
+          <div className="mt-2 grid w-full gap-4 text-left sm:grid-cols-1">
+            <div className="flex items-start gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+              <Bot className="mt-0.5 h-5 w-5 shrink-0 text-zinc-500" />
+              <p className="text-sm text-zinc-700">
+                <strong className="text-zinc-900">Uso masivo de bots:</strong>{" "}
+                el servicio ha sido blanco de consultas automatizadas a gran
+                escala, muy por encima del uso que hace una persona real.
+              </p>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+              <DollarSign className="mt-0.5 h-5 w-5 shrink-0 text-zinc-500" />
+              <p className="text-sm text-zinc-700">
+                <strong className="text-zinc-900">
+                  Costos de infraestructura insostenibles:
+                </strong>{" "}
+                ese abuso ha disparado los costos de operación de un proyecto
+                que es y siempre ha sido gratuito y sin fines de lucro.
+              </p>
+            </div>
+
+            <div className="flex items-start gap-3 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
+              <Ban className="mt-0.5 h-5 w-5 shrink-0 text-zinc-500" />
+              <p className="text-sm text-zinc-700">
+                <strong className="text-zinc-900">
+                  Intentos de reventa del servicio:
+                </strong>{" "}
+                algunas personas han intentado ofrecer MisLíneas como un
+                servicio de pago propio, incluso con publicidad, sin ninguna
+                relación con este proyecto.
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-4 max-w-xl text-sm text-zinc-500">
+            Estamos trabajando en encontrar una forma de mitigar estos problemas
+            para poder reactivar el servicio. Gracias por tu paciencia y por
+            seguir apoyando este proyecto independiente.
+          </p>
         </div>
 
         <Footer />
