@@ -3,10 +3,18 @@ import { readFileSync } from "node:fs";
 import { test } from "node:test";
 import ts from "typescript";
 
-function loadRoute(verification) {
+function loadRoute(verification, local = false) {
   let providerCalls = 0;
   let verifiedToken;
   const mocks = {
+    "@/lib/local-access": { isLocalLookup: () => local },
+    "@/lib/providers/att": {
+      lookupCURPInATT: async () => {
+        if (!local) throw new Error("AT&T must not run outside local mode");
+        providerCalls++;
+        return { company: "AT&T", lines: [], isRegistered: false };
+      },
+    },
     "@/lib/cors": {
       corsHeaders: () => ({
         "Access-Control-Allow-Origin": "https://mislineas.com.mx",
@@ -97,4 +105,13 @@ test("successful verification preserves NDJSON streaming with mocked providers",
   assert.ok(lines.length > 0);
   assert.equal(lines.length, route.calls());
   for (const line of lines) assert.ok(JSON.parse(line).provider);
+});
+
+test("local request includes AT&T without contacting Turnstile", async () => {
+  const route = loadRoute({ success: false, status: 503, error: "no keys" }, true);
+  const response = await route.POST(request(JSON.stringify({ curp: "synthetic" })));
+  assert.equal(response.status, 200);
+  const lines = (await response.text()).trim().split("\n").map((line) => JSON.parse(line));
+  assert.ok(lines.some((line) => line.provider === "AT&T"));
+  assert.equal(route.token(), undefined);
 });

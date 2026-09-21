@@ -1,6 +1,7 @@
 # Protección de consultas con Cloudflare Turnstile
 
-Este cambio mantiene la página de pausa. Protege `POST /api/lookup` incluso
+La página principal utiliza la interfaz clara de shadcn y consultas reales.
+Protege `POST /api/lookup` incluso
 si se invoca directamente: ninguna operadora se consulta sin una respuesta
 válida de Siteverify con hostname permitido y `action=lookup`. Si falta la
 configuración o Cloudflare no responde en 10 segundos, la consulta se rechaza.
@@ -20,44 +21,30 @@ No se envía la CURP a Cloudflare ni se registran tokens o claves.
 La CSP permite los scripts e iframes de `https://challenges.cloudflare.com`.
 Las peticiones CORS siguen usando JSON y el mismo endpoint de streaming.
 
-## Reactivación por el mantenedor
+## Interfaz y desarrollo local
 
-Este PR no restaura el contenido de `src/app/page.tsx`. Cuando se reactive la
-interfaz, el handler de `CurpForm` debe pasar el segundo argumento a `consultar`:
+`LookupForm` muestra Turnstile en modo claro y adaptable al ancho del formulario.
+El envío requiere una CURP válida y un token. El token se consume al enviar y se
+renueva después de cada intento, incluidos errores. `useLookup` lo envía al backend.
+Sin claves, el formulario y la API fallan de forma cerrada.
 
-```tsx
-const handleConsultar = (event: React.FormEvent, turnstileToken: string) => {
-  event.preventDefault();
-  if (!curpIsValid) return;
-  void consultar(curp, turnstileToken);
-};
-```
+Para pruebas locales autorizadas, iniciar Next en loopback (`--hostname 127.0.0.1`)
+y definir `LOCAL_LOOKUP_ENABLED=true` y `NEXT_PUBLIC_LOCAL_LOOKUP=true` en `.env.local`.
+Este modo realiza consultas reales. El servidor solo lo admite en desarrollo, con
+origen loopback y cabeceras de una solicitud del mismo origen. En producción,
+ambas rutas requieren Turnstile aunque esas variables estén definidas.
+AT&T se incluye únicamente en este modo local; requiere Chrome y la configuración
+de proxy residencial del adaptador. Las credenciales nunca deben versionarse.
 
-`CurpForm` muestra el widget y deshabilita el envío hasta tener un token.
-Consume el token al enviar, y monta una nueva verificación tras cada consulta,
-incluidos errores y reintentos. La expiración invalida el token. Los errores
-del widget ofrecen reintento; si el script no carga, se puede recargar la página.
-`useLookup.consultar` requiere el token y lo incluye en el JSON de la petición.
+La URL de API pública sigue siendo `NEXT_PUBLIC_API_URL`; el modo local utiliza
+el mismo origen para consultas y exportaciones. El diseño anterior y los datos
+personales utilizados en pruebas no forman parte de este PR.
 
-## Verificación
+## Validación
 
-```bash
-node --test tests/*.test.mjs
-pnpm exec tsc --noEmit
-pnpm build
-```
-
-Las pruebas verifican que la API no llama proveedores cuando se rechaza la
-verificación y que conserva el streaming al aceptarla. Usan respuestas simuladas
-de Siteverify: éxito, configuración
-ausente, tokens inválidos, rechazo de expiración/reutilización, hostname y
-acción incorrectos, timeout y respuestas defectuosas. No consultan CURPs reales.
-
-Antes de reabrir, probar la interfaz restaurada con las claves de prueba oficiales
-de Cloudflare y `TURNSTILE_ALLOWED_HOSTNAMES=localhost` en un entorno local. Usar
-un backend con proveedores simulados para no ejecutar consultas reales. Verificar
-éxito, fallo, expiración, bloqueo del script y nueva verificación tras reintento.
-Las claves de prueba nunca deben utilizarse en producción.
+Ejecutar `node --test tests/*.test.mjs`. Las pruebas usan proveedores simulados y
+no transmiten CURPs reales. Antes del despliegue, configurar las claves del widget
+y comprobar el flujo de Turnstile en el dominio autorizado.
 
 ## Alcance y controles complementarios
 

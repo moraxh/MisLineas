@@ -3,6 +3,7 @@ export const maxDuration = 120;
 
 import type { NextRequest } from "next/server";
 import { corsHeaders, corsPreflight } from "@/lib/cors";
+import { isLocalLookup } from "@/lib/local-access";
 import {
   lookupCURPINMobig,
   lookupCURPInABIB,
@@ -19,6 +20,7 @@ import {
   loookupCURPInTalentoNetMVNO,
   loookupCURPInVirginMobile,
 } from "@/lib/providers";
+import { lookupCURPInATT } from "@/lib/providers/att";
 import { validateCURP } from "@/lib/providers/curp";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { stripCURPs } from "@/lib/sanitize";
@@ -182,9 +184,12 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const verification = await verifyTurnstile(
-    "turnstileToken" in body ? body.turnstileToken : undefined,
-  );
+  const local = isLocalLookup(req);
+  const verification = local
+    ? { success: true as const }
+    : await verifyTurnstile(
+        "turnstileToken" in body ? body.turnstileToken : undefined,
+      );
   if (!verification.success) {
     return Response.json(
       { error: verification.error },
@@ -239,6 +244,8 @@ export async function POST(req: NextRequest) {
       };
 
       const queue = [...providers];
+      if (local)
+        queue.unshift({ provider: "AT&T", lookupFunction: lookupCURPInATT });
       const worker = async () => {
         for (;;) {
           const p = queue.shift();

@@ -9,6 +9,8 @@ type TurnstileApi = {
     options: {
       sitekey: string;
       action: string;
+      theme: "light";
+      size: "flexible";
       callback: (token: string) => void;
       "expired-callback": () => void;
       "error-callback": () => void;
@@ -43,6 +45,8 @@ export function Turnstile({ onToken }: { onToken: (token: string) => void }) {
       id = api.render(container.current, {
         sitekey,
         action: "lookup",
+        theme: "light",
+        size: "flexible",
         callback: (token) => {
           setFailed(false);
           callback.current(token);
