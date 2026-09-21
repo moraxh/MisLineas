@@ -73,11 +73,7 @@ export function Turnstile({ onToken }: { onToken: (token: string) => void }) {
   }, [ready, sitekey, attempt]);
 
   if (!sitekey) {
-    return (
-      <p role="alert" className="text-sm text-red-600">
-        La verificación de seguridad no está configurada.
-      </p>
-    );
+    return null;
   }
 
   return (

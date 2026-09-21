@@ -6,7 +6,7 @@ export function Notices() {
         className="hidden h-1 w-1 rounded-full bg-zinc-300 sm:block"
         aria-hidden="true"
       />
-      <span>Más de 150,000 consultas realizadas</span>
+      <span>Más de 250,000 consultas realizadas</span>
       <span
         className="hidden h-1 w-1 rounded-full bg-zinc-300 sm:block"
         aria-hidden="true"

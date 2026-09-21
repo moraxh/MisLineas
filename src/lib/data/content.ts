@@ -35,7 +35,7 @@ export const ARCO_RIGHTS = [
 ];
 
 export const TOTAL_PROVIDERS = 104;
-export const TOTAL_QUERIES = 150000;
+export const TOTAL_QUERIES = 250000;
 export const QUERY_TIMEOUT_MS = 15000;
 
 // Hard ceiling on a single provider request. Must stay below the client

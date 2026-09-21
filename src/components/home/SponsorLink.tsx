@@ -14,16 +14,17 @@ export function SponsorLink({ variant }: SponsorLinkProps) {
     <a
       href={VELAR_URL}
       target="_blank"
-      rel="sponsored noopener noreferrer"
+      rel="sponsored noopener"
+      referrerPolicy="strict-origin-when-cross-origin"
       aria-label="Patrocinado por Velar Technologies"
       title="Patrocinado por Velar Technologies"
       className={
         isHeader
-          ? "inline-flex shrink-0 items-center rounded-md border border-zinc-200 bg-zinc-50/70 px-2 py-1 text-zinc-500 transition-colors hover:border-zinc-300 hover:bg-zinc-100"
+          ? "inline-flex shrink-0 items-center gap-2 rounded-lg border border-sky-100 bg-sky-50/70 px-2.5 py-1.5 text-zinc-500 transition-colors hover:border-sky-200 hover:bg-sky-50"
           : "inline-flex items-center gap-2 text-zinc-500 transition-colors hover:text-zinc-900"
       }
     >
-      <span className={isHeader ? "sr-only" : "text-xs font-medium"}>
+      <span className="text-[11px] font-medium leading-none whitespace-nowrap">
         Patrocinado por
       </span>
       <Image

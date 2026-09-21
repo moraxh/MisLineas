@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Search } from "lucide-react";
+import { Github } from "lucide-react";
 import { motion, useInView, useMotionValue, useSpring } from "motion/react";
 import { useEffect, useRef } from "react";
 import { TOTAL_QUERIES } from "@/lib/data/content";
@@ -30,15 +30,11 @@ export function Hero() {
   return (
     <div className="space-y-5 text-center">
       <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-xs font-medium text-zinc-600">
-        <div className="inline-flex items-center gap-2">
-          <Search className="h-3.5 w-3.5" />
-          <span>Consulta las plataformas disponibles en un solo lugar.</span>
-        </div>
         <a
           href="https://github.com/moraxh/MisLineas"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 border-l border-zinc-300 pl-3 text-emerald-700 transition-colors hover:text-emerald-900"
+          className="inline-flex items-center gap-2 text-emerald-700 transition-colors hover:text-emerald-900"
         >
           <Github className="h-3.5 w-3.5" />
           <span>Código abierto y auditable</span>

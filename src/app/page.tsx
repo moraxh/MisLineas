@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle, ArrowUpRight } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, PartyPopper } from "lucide-react";
 import { AnimatePresence } from "motion/react";
 import type React from "react";
 import { useState } from "react";
@@ -15,6 +15,7 @@ import { Notices } from "@/components/home/Notices";
 import { OperatorsSection } from "@/components/home/OperatorsSection";
 import { ResultsPanel } from "@/components/home/ResultsPanel";
 import { SecuritySection } from "@/components/home/SecuritySection";
+import { SponsorSection } from "@/components/home/SponsorSection";
 import { WhySection } from "@/components/home/WhySection";
 import { ReportDialog } from "@/components/ui/ReportDialog";
 import { getCurpValidationError } from "@/lib/curp";
@@ -59,20 +60,18 @@ export default function MisLineas() {
 
   return (
     <div className="min-h-screen bg-[linear-gradient(180deg,#fafaf9_0%,#f4f4f5_42%,#ffffff_100%)] font-sans text-zinc-900 selection:bg-zinc-900 selection:text-white">
-      <div className="border-b border-red-800 bg-red-600 px-4 py-2.5 text-sm text-white">
+      <div className="border-b border-emerald-200 bg-emerald-50 px-4 py-2.5 text-sm text-emerald-950">
         <div className="mx-auto flex max-w-6xl items-center justify-center gap-2.5">
-          <AlertTriangle className="h-4 w-4 shrink-0 text-white" />
-          <p className="line-clamp-2 text-center sm:line-clamp-1">
-            <strong>Aviso Sorcel:</strong> un bloqueo de bots del proveedor
-            causó falsos positivos (líneas marcadas como registradas sin
-            estarlo). Ya quedó corregido.{" "}
+          <PartyPopper className="mt-0.5 h-4 w-4 shrink-0 self-start text-emerald-600 sm:mt-0 sm:self-auto" />
+          <p className="text-center leading-snug">
+            <strong>¡Estamos de vuelta!</strong> Pausamos el servicio por
+            seguridad y costos tras un mal uso de la plataforma. Ahora Velar
+            Technologies es nuestro patrocinador y cubre todos los gastos.{" "}
             <a
-              href="https://www.soriup.mx/consultavinculacion.html"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 font-semibold underline decoration-white/60 underline-offset-2 hover:text-red-100"
+              href="/donar"
+              className="inline-flex items-center gap-1 font-semibold underline decoration-emerald-400 underline-offset-2 hover:text-emerald-700"
             >
-              Verificar directamente <ArrowUpRight className="h-3.5 w-3.5" />
+              Conocer más <ArrowUpRight className="h-3.5 w-3.5" />
             </a>
           </p>
         </div>
@@ -164,6 +163,9 @@ export default function MisLineas() {
             </AccordionItem>
             <AccordionItem id="arco" title="Derechos ARCO y Denuncias">
               <ArcoSection />
+            </AccordionItem>
+            <AccordionItem id="velar" title="¿Quiénes son Velar Technologies?">
+              <SponsorSection />
             </AccordionItem>
           </div>
         </div>

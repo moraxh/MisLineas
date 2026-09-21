@@ -3,7 +3,6 @@
 import {
   AlertCircle,
   ArrowRight,
-  Ban,
   ClipboardPaste,
   Loader2,
   ShieldCheck,
@@ -171,31 +170,6 @@ export function CurpForm({
               únicamente en tu navegador.
             </p>
           </div>
-          <details className="group rounded-xl border border-amber-100 bg-amber-50/70 text-sm text-amber-900">
-            <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2.5 px-3.5 font-medium text-zinc-700">
-              <Ban className="h-4 w-4 shrink-0 text-amber-600" />
-              Algunas operadoras requieren revisión manual
-              <span
-                className="ml-auto text-lg text-zinc-400 transition-transform group-open:rotate-45"
-                aria-hidden="true"
-              >
-                +
-              </span>
-            </summary>
-            <p className="border-t border-amber-100 px-3.5 py-3 leading-6">
-              Si una plataforma bloquea la consulta, te damos su ruta oficial
-              para continuar, por ejemplo en{" "}
-              <a
-                href="https://att.com.mx/controlpersonal/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="underline font-medium hover:text-orange-900 transition-colors"
-              >
-                att.com.mx/controlpersonal
-              </a>
-              .
-            </p>
-          </details>
           <div className="flex items-center justify-between text-xs">
             <p className="text-zinc-500">
               ¿No recuerdas tu CURP?{" "}

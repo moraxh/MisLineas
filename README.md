@@ -17,7 +17,7 @@ Dependiendo de la operadora, el proceso puede implicar entrar a decenas de porta
 
 MisLíneas nace para resolver ese problema en una sola consulta.
 
-La aplicación revisa en paralelo los mecanismos de verificación disponibles de operadores y OMVs, y muestra los resultados conforme cada proveedor responde. Después de más de 150,000 consultas, el objetivo sigue siendo simple: ayudar a cualquier persona a revisar qué líneas aparecen registradas a su nombre sin tener que navegar por más de cien sitios distintos.
+La aplicación revisa en paralelo los mecanismos de verificación disponibles de operadores y OMVs, y muestra los resultados conforme cada proveedor responde. Después de más de 250,000 consultas, el objetivo sigue siendo simple: ayudar a cualquier persona a revisar qué líneas aparecen registradas a su nombre sin tener que navegar por más de cien sitios distintos.
 
 ---
 
