@@ -1,7 +1,7 @@
 # Protección de consultas con Cloudflare Turnstile
 
-La página principal utiliza la interfaz clara de shadcn y consultas reales.
-Protege `POST /api/lookup` incluso
+La página principal conserva la interfaz original y las consultas reales.
+Turnstile protege `POST /api/lookup` incluso
 si se invoca directamente: ninguna operadora se consulta sin una respuesta
 válida de Siteverify con hostname permitido y `action=lookup`. Si falta la
 configuración o Cloudflare no responde en 10 segundos, la consulta se rechaza.
@@ -23,7 +23,7 @@ Las peticiones CORS siguen usando JSON y el mismo endpoint de streaming.
 
 ## Interfaz y desarrollo local
 
-`LookupForm` muestra Turnstile en modo claro y adaptable al ancho del formulario.
+El formulario original muestra Turnstile en modo claro y adaptable al ancho disponible.
 El envío requiere una CURP válida y un token. El token se consume al enviar y se
 renueva después de cada intento, incluidos errores. `useLookup` lo envía al backend.
 Sin claves, el formulario y la API fallan de forma cerrada.

@@ -88,7 +88,7 @@ pnpm start
 Variables de entorno: ver [`.env.example`](.env.example).
 
 Protección de consultas: ver [configuración de Cloudflare Turnstile](docs/turnstile.md).
-La API requiere verificación válida; la página de pausa se mantiene.
+La API requiere una verificación válida antes de consultar proveedores.
 
 ---
 
