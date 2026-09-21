@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Menu, ShieldAlert, X } from "lucide-react";
+import { Menu, ShieldAlert, X } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
@@ -28,9 +28,7 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-4">
-            <SponsorLink variant="header" />
-
-            <div className="hidden items-center gap-6 md:flex">
+            <div className="hidden items-center gap-5 md:flex">
               <a
                 href="#seguridad"
                 className="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
@@ -43,25 +41,19 @@ export function Navbar() {
               >
                 Derechos ARCO
               </a>
-              <a
-                href="https://github.com/moraxh/MisLineas"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-zinc-500 hover:text-zinc-900 transition-colors"
-                aria-label="Código fuente en GitHub"
-              >
-                <Github className="w-5 h-5" />
-              </a>
-              <a
-                href="https://portal.crt.gob.mx/reporte-fallas-plataforma-registro"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-zinc-800 transition-all flex items-center gap-2"
-              >
-                <ShieldAlert className="w-4 h-4" />
-                Reportar Fraude
-              </a>
             </div>
+
+            <SponsorLink variant="header" />
+
+            <a
+              href="https://portal.crt.gob.mx/reporte-fallas-plataforma-registro"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden items-center gap-2 whitespace-nowrap rounded-lg bg-black px-3.5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 md:flex"
+            >
+              <ShieldAlert className="h-4 w-4" />
+              Reportar Fraude
+            </a>
 
             <button
               type="button"

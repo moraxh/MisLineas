@@ -16,19 +16,14 @@ export function SponsorLink({ variant }: SponsorLinkProps) {
       target="_blank"
       rel="sponsored noopener noreferrer"
       aria-label="Patrocinado por Velar Technologies"
+      title="Patrocinado por Velar Technologies"
       className={
         isHeader
-          ? "inline-flex shrink-0 items-center gap-1.5 text-zinc-500 transition-colors hover:text-zinc-900"
+          ? "inline-flex shrink-0 items-center rounded-md border border-zinc-200 bg-zinc-50/70 px-2 py-1 text-zinc-500 transition-colors hover:border-zinc-300 hover:bg-zinc-100"
           : "inline-flex items-center gap-2 text-zinc-500 transition-colors hover:text-zinc-900"
       }
     >
-      <span
-        className={
-          isHeader
-            ? "hidden text-[11px] font-medium lg:inline"
-            : "text-xs font-medium"
-        }
-      >
+      <span className={isHeader ? "sr-only" : "text-xs font-medium"}>
         Patrocinado por
       </span>
       <Image
@@ -37,7 +32,7 @@ export function SponsorLink({ variant }: SponsorLinkProps) {
         width={isPage ? 132 : isHeader ? 88 : 108}
         height={isPage ? 50 : isHeader ? 34 : 41}
         className={
-          isPage ? "h-10 w-auto" : isHeader ? "h-7 w-auto" : "h-8 w-auto"
+          isPage ? "h-10 w-auto" : isHeader ? "h-6 w-auto" : "h-8 w-auto"
         }
       />
     </a>
