@@ -252,12 +252,14 @@ export function ResultsPanel({
 
       {!loading && (
         <p className="text-center text-xs text-zinc-400">
-          Herramienta gratuita y sin anuncios.{" "}
+          Herramienta gratuita y sin anuncios. Con el apoyo de{" "}
           <a
-            href="/donar"
+            href="https://velartech.com.mx/"
+            target="_blank"
+            rel="sponsored noopener noreferrer"
             className="underline underline-offset-2 hover:text-zinc-600 transition-colors"
           >
-            Ayúdanos a mantenerla →
+            Velar Technologies
           </a>
         </p>
       )}

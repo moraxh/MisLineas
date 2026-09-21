@@ -1,3 +1,4 @@
+import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
 
@@ -62,31 +63,19 @@ export function Footer() {
           </a>
         </div>
         <a
-          href="/donar"
-          className="flex items-center gap-1.5 whitespace-nowrap text-pink-600 bg-pink-50 hover:bg-pink-100 px-3 py-1.5 rounded-full font-medium transition-colors shrink-0"
+          href="https://velartech.com.mx/"
           target="_blank"
-          rel="noopener noreferrer"
+          rel="sponsored noopener noreferrer"
+          className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs text-zinc-500 transition-colors hover:text-zinc-900"
         >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="w-3.5 h-3.5 shrink-0"
-            aria-hidden="true"
-          >
-            <path d="M20.42 4.58a5.4 5.4 0 0 0-7.65 0l-.77.78-.77-.78a5.4 5.4 0 0 0-7.65 7.65l.77.78L12 20.23l7.65-7.22.77-.78a5.4 5.4 0 0 0 0-7.65z" />
-          </svg>
-          Apoyar el proyecto
+          Con el apoyo de Velar Technologies
+          <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
         </a>
       </div>
       <p className="text-center text-xs text-zinc-400 max-w-2xl mx-auto">
-        Las donaciones son voluntarias y se destinan únicamente a cubrir costos
-        de infraestructura (hosting, dominio y proxies). MisLíneas sigue siendo
-        un proyecto sin fines de lucro.
+        MisLíneas sigue siendo gratuito, independiente y sin fines de lucro.
+        Velar Technologies cubre actualmente todos los gastos de
+        infraestructura y mantenimiento del servicio.
       </p>
     </footer>
   );

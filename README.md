@@ -62,6 +62,10 @@ Las consultas se ejecutan en paralelo utilizando `Promise.allSettled`, mientras 
 
 El frontend se despliega en Vercel y el backend corre en Docker sobre un servidor propio (Oracle Cloud), comunicándose vía CORS y actualizándose automáticamente con cada nueva versión publicada.
 
+Velar Technologies cubre actualmente todos los gastos de infraestructura y
+mantenimiento del servicio. MisLíneas sigue siendo gratuito, independiente y
+sin fines de lucro.
+
 ---
 
 ## Desarrollo
