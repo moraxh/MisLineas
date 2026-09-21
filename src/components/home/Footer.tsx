@@ -1,6 +1,6 @@
-import { ExternalLink } from "lucide-react";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
+import { SponsorLink } from "@/components/home/SponsorLink";
 
 export function Footer() {
   return (
@@ -62,20 +62,12 @@ export function Footer() {
             contact@moraxh.dev
           </a>
         </div>
-        <a
-          href="https://velartech.com.mx/"
-          target="_blank"
-          rel="sponsored noopener noreferrer"
-          className="inline-flex items-center gap-1.5 whitespace-nowrap text-xs text-zinc-500 transition-colors hover:text-zinc-900"
-        >
-          Con el apoyo de Velar Technologies
-          <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-        </a>
+        <SponsorLink variant="footer" />
       </div>
       <p className="text-center text-xs text-zinc-400 max-w-2xl mx-auto">
         MisLíneas sigue siendo gratuito, independiente y sin fines de lucro.
-        Velar Technologies cubre actualmente todos los gastos de
-        infraestructura y mantenimiento del servicio.
+        Velar Technologies cubre actualmente todos los gastos de infraestructura
+        y mantenimiento del servicio.
       </p>
     </footer>
   );

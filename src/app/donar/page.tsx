@@ -1,5 +1,6 @@
 import { ArrowLeft, ExternalLink, HeartHandshake } from "lucide-react";
 import Link from "next/link";
+import { SponsorLink } from "@/components/home/SponsorLink";
 
 const VELAR_URL = "https://velartech.com.mx/";
 
@@ -26,12 +27,13 @@ export default function DonarPage() {
             <p className="max-w-md text-sm leading-7 text-zinc-600 sm:text-base">
               Velar Technologies cubre actualmente todos los gastos de
               infraestructura y mantenimiento del servicio. Por eso, no
-              necesitas hacer una donación para que MisLíneas siga disponible
-              de forma gratuita.
+              necesitas hacer una donación para que MisLíneas siga disponible de
+              forma gratuita.
             </p>
           </div>
 
           <section className="w-full rounded-2xl border border-zinc-200 bg-white p-5 text-left shadow-sm">
+            <SponsorLink variant="page" />
             <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-400">
               Apoyo al proyecto
             </p>

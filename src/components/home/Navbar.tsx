@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
 import { useState } from "react";
 import logo from "@/assets/logo.png";
+import { SponsorLink } from "@/components/home/SponsorLink";
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -26,52 +27,56 @@ export function Navbar() {
             </span>
           </div>
 
-          <div className="hidden md:flex items-center gap-6">
-            <a
-              href="#seguridad"
-              className="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
-            >
-              Seguridad
-            </a>
-            <a
-              href="#arco"
-              className="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
-            >
-              Derechos ARCO
-            </a>
-            <a
-              href="https://github.com/moraxh/MisLineas"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-zinc-500 hover:text-zinc-900 transition-colors"
-              aria-label="Código fuente en GitHub"
-            >
-              <Github className="w-5 h-5" />
-            </a>
-            <a
-              href="https://portal.crt.gob.mx/reporte-fallas-plataforma-registro"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-zinc-800 transition-all flex items-center gap-2"
-            >
-              <ShieldAlert className="w-4 h-4" />
-              Reportar Fraude
-            </a>
-          </div>
+          <div className="flex items-center gap-4">
+            <SponsorLink variant="header" />
 
-          <button
-            type="button"
-            className="md:hidden p-2 text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors"
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            aria-expanded={isMenuOpen}
-            aria-label="Menú"
-          >
-            {isMenuOpen ? (
-              <X className="w-5 h-5" />
-            ) : (
-              <Menu className="w-5 h-5" />
-            )}
-          </button>
+            <div className="hidden items-center gap-6 md:flex">
+              <a
+                href="#seguridad"
+                className="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+              >
+                Seguridad
+              </a>
+              <a
+                href="#arco"
+                className="text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+              >
+                Derechos ARCO
+              </a>
+              <a
+                href="https://github.com/moraxh/MisLineas"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-500 hover:text-zinc-900 transition-colors"
+                aria-label="Código fuente en GitHub"
+              >
+                <Github className="w-5 h-5" />
+              </a>
+              <a
+                href="https://portal.crt.gob.mx/reporte-fallas-plataforma-registro"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-zinc-800 transition-all flex items-center gap-2"
+              >
+                <ShieldAlert className="w-4 h-4" />
+                Reportar Fraude
+              </a>
+            </div>
+
+            <button
+              type="button"
+              className="md:hidden p-2 text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              aria-expanded={isMenuOpen}
+              aria-label="Menú"
+            >
+              {isMenuOpen ? (
+                <X className="w-5 h-5" />
+              ) : (
+                <Menu className="w-5 h-5" />
+              )}
+            </button>
+          </div>
         </div>
       </nav>
 
