@@ -25,7 +25,8 @@ export function AboutVelar() {
         <a
           href="https://velartech.com.mx/"
           target="_blank"
-          rel="sponsored noopener noreferrer"
+          rel="sponsored noopener"
+          referrerPolicy="strict-origin-when-cross-origin"
           className="inline-flex min-h-11 items-center gap-1.5 rounded-sm text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring"
         >
           Conoce Velar <ArrowUpRight className="size-3.5" aria-hidden="true" />

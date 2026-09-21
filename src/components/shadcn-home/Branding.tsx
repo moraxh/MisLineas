@@ -8,7 +8,8 @@ export function SponsorLink({ footer = false }: { footer?: boolean }) {
     <a
       href="https://velartech.com.mx/"
       target="_blank"
-      rel="sponsored noopener noreferrer"
+      rel="sponsored noopener"
+      referrerPolicy="strict-origin-when-cross-origin"
       className="inline-flex items-center gap-2.5 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-ring"
       aria-label="Sponsored by Velar Technologies. Visitar sitio web"
     >
