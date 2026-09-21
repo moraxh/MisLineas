@@ -10,6 +10,8 @@ import {
   X,
 } from "lucide-react";
 import type React from "react";
+import { useState } from "react";
+import { Turnstile } from "@/components/home/Turnstile";
 import { getCurpValidationError } from "@/lib/curp";
 import { cn } from "@/lib/utils";
 
@@ -20,7 +22,7 @@ interface CurpFormProps {
   error: string | null;
   timedOut: boolean;
   history: string[];
-  onSubmit: (e: React.FormEvent) => void;
+  onSubmit: (e: React.FormEvent, turnstileToken: string) => void;
   onRetry: () => void;
   onSelectHistory: (v: string) => void;
 }
@@ -36,6 +38,8 @@ export function CurpForm({
   onRetry,
   onSelectHistory,
 }: CurpFormProps) {
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [verificationAttempt, setVerificationAttempt] = useState(0);
   const curpValidationError = getCurpValidationError(curp);
   const curpIsValid = curp.length === 18 && !curpValidationError;
   const curpCountColor =
@@ -58,7 +62,17 @@ export function CurpForm({
 
   return (
     <div className="rounded-3xl border border-zinc-200 bg-white p-5 shadow-lg shadow-zinc-950/5 sm:p-7">
-      <form onSubmit={onSubmit} className="space-y-5">
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          if (loading || !curpIsValid || !turnstileToken) return;
+          const token = turnstileToken;
+          setTurnstileToken("");
+          setVerificationAttempt((value) => value + 1);
+          onSubmit(event, token);
+        }}
+        className="space-y-5"
+      >
         <div className="space-y-3">
           <div className="space-y-1">
             <p className="text-xs font-semibold uppercase tracking-[0.16em] text-zinc-400">
@@ -229,10 +243,14 @@ export function CurpForm({
           </div>
         )}
 
+        {!loading && (
+          <Turnstile key={verificationAttempt} onToken={setTurnstileToken} />
+        )}
+
         <button
           type="submit"
-          disabled={loading || !curpIsValid}
-          aria-disabled={loading || !curpIsValid}
+          disabled={loading || !curpIsValid || !turnstileToken}
+          aria-disabled={loading || !curpIsValid || !turnstileToken}
           className="flex min-h-14 w-full items-center justify-center gap-2 rounded-2xl bg-black px-5 py-4 font-semibold text-white transition-colors hover:bg-zinc-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-zinc-900 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? (

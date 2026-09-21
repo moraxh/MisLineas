@@ -17,7 +17,7 @@ export function useLookup(onConsult?: (curp: string) => void) {
   const abortRef = useRef<AbortController | null>(null);
   const requestIdRef = useRef(0);
 
-  const consultar = async (curp: string) => {
+  const consultar = async (curp: string, turnstileToken: string) => {
     abortRef.current?.abort();
 
     const requestId = requestIdRef.current + 1;
@@ -49,7 +49,7 @@ export function useLookup(onConsult?: (curp: string) => void) {
       const response = await fetch(`${API_URL}/api/lookup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ curp: curp.toUpperCase() }),
+        body: JSON.stringify({ curp: curp.toUpperCase(), turnstileToken }),
         signal: controller.signal,
       });
 
