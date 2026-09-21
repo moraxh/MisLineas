@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
 
 html {
   scroll-behavior: smooth;
@@ -35,43 +33,3 @@ h1 {
     background-color: #d4d4d8; /* zinc-300 */
   }
 }
-
-@font-face { font-family: Rethink; src: url('/fonts/RethinkSans-var-latin.woff2') format('woff2'); font-weight: 100 900; font-display: swap; }
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--foreground);
-  --color-popover: var(--card);
-  --color-popover-foreground: var(--foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--muted);
-  --color-secondary-foreground: var(--foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--muted);
-  --color-accent-foreground: var(--foreground);
-  --color-destructive: #b42318;
-  --color-border: var(--border);
-  --color-input: var(--border);
-  --color-ring: #81b5c9;
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-}
-:root {
-  --background: #fff;
-  --foreground: #27343c;
-  --card: #fff;
-  --primary: #e0f2fa;
-  --primary-foreground: #176784;
-  --muted: #f5f7f8;
-  --muted-foreground: #65737c;
-  --border: #e3e8eb;
-  --radius: .625rem;
-}
-.shadcn-home { font-family: Rethink, sans-serif; color-scheme: light; }
-@layer base { * { border-color: var(--border); } }
-[data-slot="dialog-overlay"] { background: rgb(230 237 240 / .7); backdrop-filter: blur(3px); }
