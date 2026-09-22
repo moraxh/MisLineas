@@ -3,6 +3,7 @@ export const maxDuration = 120;
 
 import type { NextRequest } from "next/server";
 import { corsHeaders, corsPreflight } from "@/lib/cors";
+import { isLocalLookup } from "@/lib/local-access";
 import {
   lookupCURPINMobig,
   lookupCURPInABIB,
@@ -19,9 +20,11 @@ import {
   loookupCURPInTalentoNetMVNO,
   loookupCURPInVirginMobile,
 } from "@/lib/providers";
+import { lookupCURPInATT } from "@/lib/providers/att";
 import { validateCURP } from "@/lib/providers/curp";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { stripCURPs } from "@/lib/sanitize";
+import { verifyTurnstile } from "@/lib/turnstile";
 import type { LineResult } from "@/types";
 
 // Firing every provider at once means a dozen simultaneous name resolutions —
@@ -148,7 +151,22 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const { curp } = await req.json();
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json(
+      { error: "Invalid JSON body" },
+      { status: 400, headers: cors },
+    );
+  }
+  if (!body || typeof body !== "object" || !("curp" in body)) {
+    return Response.json(
+      { error: "CURP is required" },
+      { status: 400, headers: cors },
+    );
+  }
+  const { curp } = body;
 
   if (!curp || typeof curp !== "string") {
     return new Response(
@@ -164,6 +182,19 @@ export async function POST(req: NextRequest) {
       status: 400,
       headers: cors,
     });
+  }
+
+  const local = isLocalLookup(req);
+  const verification = local
+    ? { success: true as const }
+    : await verifyTurnstile(
+        "turnstileToken" in body ? body.turnstileToken : undefined,
+      );
+  if (!verification.success) {
+    return Response.json(
+      { error: verification.error },
+      { status: verification.status, headers: cors },
+    );
   }
 
   // Use a streaming response to return results as soon as they resolve
@@ -213,6 +244,8 @@ export async function POST(req: NextRequest) {
       };
 
       const queue = [...providers];
+      if (local)
+        queue.unshift({ provider: "AT&T", lookupFunction: lookupCURPInATT });
       const worker = async () => {
         for (;;) {
           const p = queue.shift();

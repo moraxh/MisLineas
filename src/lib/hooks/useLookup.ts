@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { QUERY_TIMEOUT_MS } from "@/lib/data/content";
+import { LOCAL_LOOKUP } from "@/lib/local-client";
 import { transformApiResponse } from "@/lib/lookup";
 import { API_URL } from "@/lib/utils";
 import type { DisplayLine, ProviderResponse } from "@/types";
@@ -17,7 +18,7 @@ export function useLookup(onConsult?: (curp: string) => void) {
   const abortRef = useRef<AbortController | null>(null);
   const requestIdRef = useRef(0);
 
-  const consultar = async (curp: string) => {
+  const consultar = async (curp: string, turnstileToken: string) => {
     abortRef.current?.abort();
 
     const requestId = requestIdRef.current + 1;
@@ -46,12 +47,15 @@ export function useLookup(onConsult?: (curp: string) => void) {
 
     try {
       onConsult?.(curp);
-      const response = await fetch(`${API_URL}/api/lookup`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ curp: curp.toUpperCase() }),
-        signal: controller.signal,
-      });
+      const response = await fetch(
+        `${LOCAL_LOOKUP ? "" : API_URL}/api/lookup`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ curp: curp.toUpperCase(), turnstileToken }),
+          signal: controller.signal,
+        },
+      );
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
