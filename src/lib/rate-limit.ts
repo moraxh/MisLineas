@@ -4,17 +4,17 @@ const WINDOW_MS = 60_000;
 const MAX_REQUESTS = 10;
 
 // Cleanup old entries every 5 minutes to avoid memory leak
-setInterval(
-  () => {
-    const now = Date.now();
-    for (const [key, entry] of store) {
-      if (entry.resetAt < now) store.delete(key);
-    }
-  },
-  5 * 60_000,
-).unref();
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of store) {
+    if (entry.resetAt < now) store.delete(key);
+  }
+}, 5 * 60_000).unref();
 
-export function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
+export function checkRateLimit(ip: string): {
+  allowed: boolean;
+  remaining: number;
+} {
   const now = Date.now();
   const entry = store.get(ip);
 

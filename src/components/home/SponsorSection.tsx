@@ -1,46 +1,29 @@
-import { Heart, ShieldCheck } from "lucide-react";
 import { SponsorLink } from "@/components/home/SponsorLink";
+import styles from "./SponsorSection.module.css";
 
 export function SponsorSection() {
   return (
-    <div className="pt-4">
-      <div className="grid gap-6 md:grid-cols-2">
-        <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-sky-700">
-              <Heart className="h-5 w-5" />
-            </div>
-            <h3 className="font-semibold text-zinc-900">
-              Con el respaldo de Velar Technologies
-            </h3>
-          </div>
-          <p className="mt-4 text-sm leading-6 text-zinc-600">
-            MisLíneas fue desarrollado por Jorge Mora, líder de desarrollo de
-            Velar Technologies. La empresa cubre los costos de operación y
-            mantenimiento para que puedas seguir consultando tus líneas gratis.
-          </p>
-        </div>
-
-        <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-700">
-              <ShieldCheck className="h-5 w-5" />
-            </div>
-            <h3 className="font-semibold text-zinc-900">
-              Por qué es necesario
-            </h3>
-          </div>
-          <p className="mt-4 text-sm leading-6 text-zinc-600">
-            El tráfico de bots ha aumentado los gastos de infraestructura y
-            protección del servicio. Velar Technologies absorbe esos costos para
-            mantener el proyecto disponible.
-          </p>
-        </div>
+    <div className={styles.content}>
+      <div className={styles.copy}>
+        <p className={styles.lead}>
+          Un proyecto independiente con respaldo técnico.
+        </p>
+        <p>
+          Velar Technologies es una empresa mexicana de tecnología que integra
+          sistemas y datos empresariales, construye software a la medida y
+          automatiza procesos con inteligencia artificial.
+        </p>
+        <p>
+          MisLíneas fue creado originalmente por Jorge Mora y Hadassah García.
+          Cuando el servicio comenzó a recibir abuso y aumentaron los costos de
+          infraestructura y protección, Velar Technologies se ofreció a
+          cubrirlos para mantener las consultas gratuitas.
+        </p>
       </div>
-
-      <div className="mt-6 flex justify-center">
-        <SponsorLink variant="page" />
-      </div>
+      <aside className={styles.sponsor} aria-label="Respaldo actual">
+        <p className={styles.sponsorLabel}>Respaldo actual</p>
+        <SponsorLink variant="page" className={styles.sponsorLink} />
+      </aside>
     </div>
   );
 }

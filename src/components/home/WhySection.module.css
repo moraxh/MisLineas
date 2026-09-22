@@ -1,0 +1,157 @@
+.content {
+  width: 100%;
+}
+
+.steps {
+  position: relative;
+  display: grid;
+  max-width: 900px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.steps::before {
+  position: absolute;
+  top: 27px;
+  right: 17%;
+  left: 17%;
+  height: 1px;
+  background: #dfe4e7;
+  content: "";
+}
+
+.step {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  flex-direction: column;
+  text-align: center;
+}
+
+.icon {
+  z-index: 1;
+  display: grid;
+  width: 56px;
+  height: 56px;
+  flex: 0 0 56px;
+  place-items: center;
+  border: 1px solid #dfe4e7;
+  border-radius: 18px;
+  background: #fff;
+  color: #263238;
+  box-shadow: 0 3px 10px rgb(31 41 55 / 0.045);
+}
+
+.step h3 {
+  margin: 18px 0 0;
+  color: #263238;
+  font-size: 1rem;
+  font-weight: 590;
+  letter-spacing: -0.015em;
+  line-height: 1.45;
+}
+
+.stepNumber {
+  color: #68777f;
+  font-variant-numeric: tabular-nums;
+}
+
+.step p {
+  max-width: 235px;
+  margin: 8px 0 0;
+  color: #68777f;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.sourceNote {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin: 30px 0 0;
+  color: #69777f;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.sourceNote a {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #53636b;
+  text-decoration: underline;
+  text-decoration-color: #b5bfc4;
+  text-underline-offset: 4px;
+  transition:
+    color 160ms ease,
+    text-decoration-color 160ms ease;
+}
+
+.sourceNote a:hover {
+  color: #1769aa;
+  text-decoration-color: currentColor;
+}
+
+.sourceNote a:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid #007aff;
+  outline-offset: 4px;
+}
+
+@media (max-width: 640px) {
+  .steps {
+    max-width: 460px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
+
+  .steps::before {
+    top: 28px;
+    bottom: 28px;
+    left: 27px;
+    width: 1px;
+    height: auto;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    align-items: center;
+    column-gap: 18px;
+    text-align: left;
+  }
+
+  .icon {
+    grid-row: span 2;
+  }
+
+  .step h3 {
+    align-self: end;
+    margin: 0;
+  }
+
+  .step p {
+    max-width: none;
+    align-self: start;
+    margin-top: 3px;
+  }
+
+  .sourceNote {
+    justify-content: flex-start;
+    margin-top: 24px;
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sourceNote a {
+    transition: none;
+  }
+}

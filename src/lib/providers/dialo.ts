@@ -39,14 +39,25 @@ export async function lookupCURPInDialo(curp: string): Promise<LineResult> {
     };
   }
 
-  const validationData = await validationResponse.json() as { statusCode?: number; body?: string | { data?: { total: number }[] } };
+  const validationData = (await validationResponse.json()) as {
+    statusCode?: number;
+    body?: string | { data?: { total: number }[] };
+  };
 
-  const body = typeof validationData.body === "string"
-    ? JSON.parse(validationData.body) as { data?: { total: number }[]; message?: string; error?: string }
-    : validationData.body;
+  const body =
+    typeof validationData.body === "string"
+      ? (JSON.parse(validationData.body) as {
+          data?: { total: number }[];
+          message?: string;
+          error?: string;
+        })
+      : validationData.body;
 
   if (!body || !Array.isArray(body.data) || body.data.length === 0) {
-    console.error("[dialo] Unexpected response structure:", JSON.stringify(stripCURPs(validationData), null, 2));
+    console.error(
+      "[dialo] Unexpected response structure:",
+      JSON.stringify(stripCURPs(validationData), null, 2),
+    );
     return {
       company: "Dialo",
       lines: [],

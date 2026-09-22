@@ -12,7 +12,7 @@ const UA =
 export async function lookupCURPINMobig(curp: string): Promise<LineResult> {
   // Step 1: GET session page to obtain cookies and CSRF token
   const sessionResponse = await fetch(SESSION_URL, {
-      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
+    signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     method: "GET",
     headers: {
       Accept:
@@ -68,7 +68,7 @@ export async function lookupCURPINMobig(curp: string): Promise<LineResult> {
 
   // Step 2: POST search
   const searchResponse = await fetch(SEARCH_URL, {
-      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
+    signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     method: "POST",
     headers: {
       Accept: "application/json",

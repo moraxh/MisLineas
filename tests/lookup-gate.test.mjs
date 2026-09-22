@@ -108,10 +108,18 @@ test("successful verification preserves NDJSON streaming with mocked providers",
 });
 
 test("local request includes AT&T without contacting Turnstile", async () => {
-  const route = loadRoute({ success: false, status: 503, error: "no keys" }, true);
-  const response = await route.POST(request(JSON.stringify({ curp: "synthetic" })));
+  const route = loadRoute(
+    { success: false, status: 503, error: "no keys" },
+    true,
+  );
+  const response = await route.POST(
+    request(JSON.stringify({ curp: "synthetic" })),
+  );
   assert.equal(response.status, 200);
-  const lines = (await response.text()).trim().split("\n").map((line) => JSON.parse(line));
+  const lines = (await response.text())
+    .trim()
+    .split("\n")
+    .map((line) => JSON.parse(line));
   assert.ok(lines.some((line) => line.provider === "AT&T"));
   assert.equal(route.token(), undefined);
 });

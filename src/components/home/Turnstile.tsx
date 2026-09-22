@@ -26,10 +26,25 @@ declare global {
   }
 }
 
-export function Turnstile({ onToken }: { onToken: (token: string) => void }) {
+export type TurnstileStatus =
+  | "loading"
+  | "verifying"
+  | "ready"
+  | "expired"
+  | "failed";
+
+export function Turnstile({
+  onToken,
+  onStatusChange,
+}: {
+  onToken: (token: string) => void;
+  onStatusChange?: (status: TurnstileStatus) => void;
+}) {
   const container = useRef<HTMLDivElement>(null);
   const callback = useRef(onToken);
   callback.current = onToken;
+  const statusCallback = useRef(onStatusChange);
+  statusCallback.current = onStatusChange;
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [attempt, setAttempt] = useState(0);
@@ -39,6 +54,7 @@ export function Turnstile({ onToken }: { onToken: (token: string) => void }) {
   useEffect(() => {
     const api = window.turnstile;
     if (!ready || !sitekey || !container.current || !api) return;
+    statusCallback.current?.("verifying");
     const invalidate = () => callback.current("");
     let id: string;
     try {
@@ -50,20 +66,27 @@ export function Turnstile({ onToken }: { onToken: (token: string) => void }) {
         callback: (token) => {
           setFailed(false);
           callback.current(token);
+          statusCallback.current?.("ready");
         },
-        "expired-callback": invalidate,
+        "expired-callback": () => {
+          invalidate();
+          statusCallback.current?.("expired");
+        },
         "timeout-callback": () => {
           invalidate();
           setFailed(true);
+          statusCallback.current?.("failed");
         },
         "error-callback": () => {
           invalidate();
           setFailed(true);
+          statusCallback.current?.("failed");
         },
       });
     } catch {
       invalidate();
       setFailed(true);
+      statusCallback.current?.("failed");
       return;
     }
     return () => {
@@ -73,7 +96,12 @@ export function Turnstile({ onToken }: { onToken: (token: string) => void }) {
   }, [ready, sitekey, attempt]);
 
   if (!sitekey) {
-    return null;
+    return (
+      <p role="alert" className="text-sm text-red-600">
+        Falta configurar la verificación de seguridad (
+        NEXT_PUBLIC_TURNSTILE_SITE_KEY).
+      </p>
+    );
   }
 
   return (
@@ -84,6 +112,7 @@ export function Turnstile({ onToken }: { onToken: (token: string) => void }) {
         onError={() => {
           callback.current("");
           setFailed(true);
+          statusCallback.current?.("failed");
         }}
       />
       <div ref={container} />
@@ -99,6 +128,7 @@ export function Turnstile({ onToken }: { onToken: (token: string) => void }) {
                 return;
               }
               setFailed(false);
+              statusCallback.current?.("loading");
               setAttempt((value) => value + 1);
             }}
           >

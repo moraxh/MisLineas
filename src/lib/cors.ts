@@ -1,4 +1,5 @@
-const ALLOWED_ORIGIN = process.env.FRONTEND_ORIGIN ?? "https://mislineas.com.mx";
+const ALLOWED_ORIGIN =
+  process.env.FRONTEND_ORIGIN ?? "https://mislineas.com.mx";
 
 export function corsHeaders(req: Request): Record<string, string> {
   const origin = req.headers.get("origin");

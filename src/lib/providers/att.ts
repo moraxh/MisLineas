@@ -85,10 +85,9 @@ async function attempt(
       timeout: 50000,
     });
 
-    await page.waitForFunction(
-      () => document.cookie.includes("OClmoOot"),
-      { timeout: 15000 },
-    );
+    await page.waitForFunction(() => document.cookie.includes("OClmoOot"), {
+      timeout: 15000,
+    });
 
     // Give Shape's JS challenge time to finalize the cookie value
     await new Promise((r) => setTimeout(r, 2000));
@@ -103,22 +102,19 @@ async function attempt(
         referer: "https://att.com.mx/controlpersonal/",
       };
 
-      const sessionRes = await fetch(
-        "/controlpersonal/api/session/initlines",
-        {
-          method: "POST",
-          headers: h,
-          credentials: "include",
-          body: JSON.stringify({
-            operation: "sessionInitLines",
-            request: {
-              uuid,
-              timestamp: new Date().toISOString(),
-              msisdn: null,
-            },
-          }),
-        },
-      );
+      const sessionRes = await fetch("/controlpersonal/api/session/initlines", {
+        method: "POST",
+        headers: h,
+        credentials: "include",
+        body: JSON.stringify({
+          operation: "sessionInitLines",
+          request: {
+            uuid,
+            timestamp: new Date().toISOString(),
+            msisdn: null,
+          },
+        }),
+      });
 
       if (!sessionRes.ok) return { error: `initlines ${sessionRes.status}` };
 
@@ -151,7 +147,9 @@ async function attempt(
 
       if (!validationRes.ok) {
         const body = await validationRes.text().catch(() => "");
-        return { error: `validatecustomer ${validationRes.status}: ${body.slice(0, 200)}` };
+        return {
+          error: `validatecustomer ${validationRes.status}: ${body.slice(0, 200)}`,
+        };
       }
 
       return { data: await validationRes.json() };

@@ -28,5 +28,12 @@ export function useCurpHistory() {
     });
   };
 
-  return { history, saveToHistory };
+  const clearHistory = () => {
+    setHistory([]);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {}
+  };
+
+  return { history, saveToHistory, clearHistory };
 }

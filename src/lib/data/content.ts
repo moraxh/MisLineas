@@ -1,37 +1,17 @@
-import { Eye, type LucideIcon, Scale, Zap } from "lucide-react";
-
-export const WHY_CARDS: { icon: LucideIcon; title: string; body: string }[] = [
-  {
-    icon: Zap,
-    title: "Un solo lugar",
-    body: "En lugar de visitar una por una las plataformas de las compañías, ingresas tu CURP una sola vez y reúnes las respuestas disponibles.",
-  },
-  {
-    icon: Scale,
-    title: "Basado en fuentes oficiales",
-    body: "Consultamos las plataformas que cada operadora pone a disposición. MisLíneas es independiente y no sustituye a la CRT ni a las compañías.",
-  },
-  {
-    icon: Eye,
-    title: "Resultados honestos",
-    body: "Te mostramos qué operadoras respondieron, cuáles no están disponibles y cuándo necesitas continuar la revisión directamente.",
-  },
-];
-
-export const SECURITY_BULLETS = [
-  "Conexiones cifradas en tránsito (TLS/HTTPS).",
-  "No necesitas crear una cuenta.",
-  "El historial de consultas se guarda solo en tu navegador.",
-  "No usamos la CURP para crear perfiles o enviar publicidad.",
-  "Los resultados indican sus límites y posibles pendientes.",
-  "Proyecto open source y auditable.",
-];
-
 export const ARCO_RIGHTS = [
-  { t: "Acceso", d: "Conoce qué datos tienen de ti" },
-  { t: "Rectificación", d: "Corrige lo inexacto" },
-  { t: "Cancelación", d: "Elimina tus datos" },
-  { t: "Oposición", d: "Niégate al uso" },
+  { t: "Acceso", d: "Conoce qué datos tiene la operadora sobre ti." },
+  {
+    t: "Rectificación",
+    d: "Solicita corregir datos inexactos o incompletos.",
+  },
+  {
+    t: "Cancelación",
+    d: "Solicita eliminar tus datos cuando proceda.",
+  },
+  {
+    t: "Oposición",
+    d: "Solicita que dejen de usar tus datos para ciertos fines.",
+  },
 ];
 
 export const TOTAL_PROVIDERS = 104;
