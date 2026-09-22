@@ -29,6 +29,15 @@ test("local access requires development, explicit configuration, loopback and sa
     process.env.LOCAL_LOOKUP_ENABLED = "true";
     assert.equal(isLocalLookup(make()), true);
     assert.equal(isLocalLookup(make("http://localhost:3100/api/lookup")), true);
+    assert.equal(isLocalLookup(make("http://0.0.0.0:3100/api/lookup")), true);
+    for (const host of ["192.168.68.50:3100", "0.0.0.0:3100"]) {
+      assert.equal(
+        isLocalLookup(
+          make("http://0.0.0.0:3100/api/lookup", `http://${host}`, host),
+        ),
+        false,
+      );
+    }
     assert.equal(isLocalLookup(make(undefined, "https://other.test")), false);
     assert.equal(
       isLocalLookup(make(undefined, undefined, undefined, "cross-site")),

@@ -1,4 +1,4 @@
-// The local UI is served on loopback only. Production always requires Turnstile.
+// Local lookup requests require a loopback browser origin. Production requires Turnstile.
 export function isLocalLookup(req: Request): boolean {
   if (
     process.env.NODE_ENV !== "development" ||
@@ -7,11 +7,12 @@ export function isLocalLookup(req: Request): boolean {
     return false;
   const url = new URL(req.url);
   const allowedHosts = ["127.0.0.1", "localhost", "[::1]"];
-  // Next may normalize the request URL to localhost while the browser uses 127.0.0.1.
+  // Next uses the server bind address in req.url, including 0.0.0.0 for LAN previews.
+  // The browser origin and Host must still match a loopback address.
   try {
     const origin = new URL(req.headers.get("origin") ?? "");
     return (
-      allowedHosts.includes(url.hostname) &&
+      (allowedHosts.includes(url.hostname) || url.hostname === "0.0.0.0") &&
       allowedHosts.includes(origin.hostname) &&
       origin.host === req.headers.get("host") &&
       origin.protocol === url.protocol &&

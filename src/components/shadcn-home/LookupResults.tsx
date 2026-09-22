@@ -22,6 +22,7 @@ import {
   getExportFilename,
 } from "@/lib/export";
 import { LOCAL_LOOKUP } from "@/lib/local-client";
+import { summarizeLookup } from "@/lib/lookup-summary";
 import { API_URL } from "@/lib/utils";
 import type { DisplayLine, ExportIntegrity, FilterTab } from "@/types";
 
@@ -55,14 +56,14 @@ export function LookupResults({
   const possibleLines = results.filter(
     (l) => l.isPossible && !l.isNotFound && !l.isError && !l.isUnavailable,
   );
-  const errorLines = results.filter((l) => l.isError);
-  const unavailableLines = results.filter((l) => l.isUnavailable);
+  const failedLines = results.filter((l) => l.isError || l.isUnavailable);
+  const summary = summarizeLookup(results);
 
   const filterTabs: { key: FilterTab; label: string; count: number }[] = [
     { key: "all", label: "Todos", count: results.length },
     { key: "confirmed", label: "Confirmados", count: confirmedLines.length },
     { key: "possible", label: "Posibles", count: possibleLines.length },
-    { key: "errors", label: "Errores", count: errorLines.length },
+    { key: "errors", label: "Sin verificar", count: failedLines.length },
   ];
 
   const getActiveResults = (): DisplayLine[] => {
@@ -75,7 +76,7 @@ export function LookupResults({
         base = possibleLines;
         break;
       case "errors":
-        base = errorLines;
+        base = failedLines;
         break;
       default:
         base = results;
@@ -178,18 +179,43 @@ export function LookupResults({
           {loading ? "Consultando operadoras" : "Resultados"}
         </CardTitle>
         <CardDescription aria-live="polite">
-          {scannedCount} proveedores respondieron
+          {loading ? "Recibiendo respuestas…" : "Consulta finalizada"}
           {queryTime
             ? ` · ${queryTime.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })}`
             : ""}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-5">
-        {!loading && (errorLines.length > 0 || unavailableLines.length > 0) && (
+        <div className="space-y-3">
+          <p className="text-xs font-medium text-muted-foreground">
+            Operadoras y grupos reportados
+          </p>
+          <dl
+            className="grid grid-cols-2 gap-3 rounded-lg border border-border p-4"
+            aria-live="polite"
+          >
+            <div>
+              <dt className="text-xs text-muted-foreground">Con respuesta</dt>
+              <dd className="mt-1 text-2xl font-semibold">
+                {summary.answered}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-muted-foreground">
+                Sin poder verificar
+              </dt>
+              <dd className="mt-1 text-2xl font-semibold">
+                {summary.unverified}
+              </dd>
+            </div>
+          </dl>
+        </div>
+        {!loading && summary.unverified > 0 && (
           <Alert>
             <AlertDescription>
-              La consulta está incompleta: algunas operadoras no pudieron
-              responder. Puedes intentar de nuevo más tarde.
+              Algunas consultas fallaron o no estuvieron disponibles. Revisa
+              “Sin verificar” para ver cuáles. Esto no significa que no tengas
+              líneas en esas operadoras.
             </AlertDescription>
           </Alert>
         )}

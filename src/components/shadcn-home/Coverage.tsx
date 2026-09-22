@@ -15,6 +15,7 @@ import {
   OPERATORS,
 } from "@/lib/data/operators";
 import { AboutVelar } from "./AboutVelar";
+import { ArcoHelp } from "./ArcoHelp";
 
 export function Coverage() {
   const [query, setQuery] = useState("");
@@ -103,6 +104,7 @@ export function Coverage() {
           </a>
         </AccordionContent>
       </AccordionItem>
+      <ArcoHelp />
       <AboutVelar />
     </Accordion>
   );
