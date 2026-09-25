@@ -4,12 +4,22 @@ import type { LineResult } from "@/types";
 const UA =
   "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36";
 
+// Stage timing: logged (without token/CURP/proxy credentials) so a timeout
+// in production shows which stage actually stalled — browser launch, proxy
+// handshake, page.goto, or the Shape cookie wait — instead of just "AT&T
+// attempt N threw: ERR_TIMED_OUT" with no indication of where the time went.
+function stageLog(label: string, t0: number) {
+  console.log(`[att] ${label} (+${Date.now() - t0}ms)`);
+}
+
 async function attempt(
   curp: string,
   executablePath: string,
   extraArgs: string[],
 ): Promise<LineResult | null> {
+  const t0 = Date.now();
   const proxy = getResidentialProxyUrl();
+  stageLog(`proxy ${proxy ? "configured" : "not configured"}`, t0);
   const { default: puppeteer } = await import("puppeteer-core");
 
   const proxyArg = proxy ? [`--proxy-server=${new URL(proxy).origin}`] : [];
@@ -28,9 +38,11 @@ async function attempt(
     headless: true,
     args,
   });
+  stageLog("browser launched", t0);
 
   try {
     const page = await browser.newPage();
+    stageLog("page opened", t0);
 
     if (proxy) {
       const proxyUrl = new URL(proxy);
@@ -38,6 +50,7 @@ async function attempt(
         username: decodeURIComponent(proxyUrl.username),
         password: decodeURIComponent(proxyUrl.password),
       });
+      stageLog("proxy authenticated", t0);
     }
 
     await page.setBypassCSP(true);
@@ -80,14 +93,17 @@ async function attempt(
       }
     });
 
+    stageLog("navigating to att.com.mx...", t0);
     await page.goto("https://att.com.mx/controlpersonal/", {
       waitUntil: "domcontentloaded",
       timeout: 50000,
     });
+    stageLog("page.goto resolved", t0);
 
     await page.waitForFunction(() => document.cookie.includes("OClmoOot"), {
       timeout: 15000,
     });
+    stageLog("Shape cookie present", t0);
 
     // Give Shape's JS challenge time to finalize the cookie value
     await new Promise((r) => setTimeout(r, 2000));
@@ -154,6 +170,7 @@ async function attempt(
 
       return { data: await validationRes.json() };
     }, curp);
+    stageLog("session+validation calls resolved", t0);
 
     if ("error" in result) {
       console.error("AT&T:", result.error);
@@ -224,9 +241,13 @@ export async function lookupCURPInATT(curp: string): Promise<LineResult> {
   }
 
   for (let i = 0; i < MAX_ATTEMPTS; i++) {
+    const attemptStart = Date.now();
     const result = await attempt(curp, executablePath, extraArgs).catch(
       (err) => {
-        console.warn(`AT&T attempt ${i + 1} threw:`, err);
+        console.warn(
+          `AT&T attempt ${i + 1} threw after ${Date.now() - attemptStart}ms:`,
+          err,
+        );
         return null;
       },
     );
