@@ -11,7 +11,7 @@
     "postinstall": "chmod +x node_modules/node-curl-impersonate/bin/* 2>/dev/null || true"
   },
   "dependencies": {
-    "@sparticuz/chromium-min": "^149.0.0",
+    "@sparticuz/chromium": "^153.0.0",
     "@upstash/redis": "^1.39.0",
     "@vercel/analytics": "^2.0.1",
     "clsx": "^2.1.1",

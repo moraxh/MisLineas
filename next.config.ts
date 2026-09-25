@@ -28,14 +28,19 @@ const nextConfig: NextConfig = {
   reactCompiler: true,
   serverExternalPackages: [
     "puppeteer-core",
-    "@sparticuz/chromium-min",
+    "@sparticuz/chromium",
     "node-curl-impersonate",
   ],
-  // Sorcel resolves this binary via a runtime-constructed path.join() call
-  // (src/lib/providers/sorcel.ts), invisible to Next.js's static file-tracing
-  // analysis — force-include it so it survives standalone output pruning.
+  // Both paths resolve their binaries at runtime through logic Next.js's
+  // static file-tracing analysis can't follow — Sorcel via a constructed
+  // path.join() call (src/lib/providers/sorcel.ts), and @sparticuz/chromium
+  // via its own internal path/tar-extraction helpers — so both get pruned
+  // from the standalone output unless force-included here.
   outputFileTracingIncludes: {
-    "/api/lookup": ["./node_modules/node-curl-impersonate/bin/**"],
+    "/api/lookup": [
+      "./node_modules/node-curl-impersonate/bin/**",
+      "./node_modules/@sparticuz/chromium/bin/**",
+    ],
   },
   async headers() {
     return [
