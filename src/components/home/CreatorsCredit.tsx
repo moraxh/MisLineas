@@ -13,9 +13,12 @@ const creators = [
   },
 ];
 
-export function CreatorsCredit() {
+export function CreatorsCredit({ variant }: { variant?: "footer" }) {
   return (
-    <section className={styles.section} aria-label="Creadores de MisLíneas">
+    <section
+      className={`${styles.section} ${variant === "footer" ? styles.footer : ""}`}
+      aria-label="Creadores de MisLíneas"
+    >
       <span className={styles.label}>Creado por</span>
       <div className={styles.list}>
         {creators.map((creator) => (

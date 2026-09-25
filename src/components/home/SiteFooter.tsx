@@ -8,7 +8,6 @@ import {
 import Image from "next/image";
 import logo from "@/assets/logo.png";
 import { CreatorsCredit } from "@/components/home/CreatorsCredit";
-import { SponsorLink } from "@/components/home/SponsorLink";
 import styles from "./SiteFooter.module.css";
 
 export function SiteFooter() {
@@ -22,6 +21,10 @@ export function SiteFooter() {
               <span>MisLíneas</span>
             </div>
             <p>Consulta las líneas telefónicas vinculadas a tu CURP.</p>
+            <p className={styles.legal}>
+              Servicio gratuito y sin fines de lucro. No afiliado al Gobierno de
+              México.
+            </p>
           </div>
 
           <div className={styles.linksArea}>
@@ -74,27 +77,23 @@ export function SiteFooter() {
                 </span>
                 <ArrowUpRight className={styles.linkArrow} aria-hidden="true" />
               </a>
+              <a href="/donar">
+                <span className={styles.linkIcon} aria-hidden="true">
+                  <HeartHandshake />
+                </span>
+                <span className={styles.linkCopy}>
+                  <span className={styles.linkName}>Apoyar el proyecto</span>
+                  <span className={styles.linkDescription}>
+                    Conoce el respaldo actual
+                  </span>
+                </span>
+                <ArrowUpRight className={styles.linkArrow} aria-hidden="true" />
+              </a>
             </nav>
           </div>
         </div>
 
-        <div className={styles.meta}>
-          <p>
-            Servicio gratuito y sin fines de lucro. No afiliado al Gobierno de
-            México.
-          </p>
-          <a className={styles.support} href="/donar">
-            <HeartHandshake size={16} aria-hidden="true" />
-            <span>Apoyar el proyecto</span>
-          </a>
-          <SponsorLink
-            variant="footer"
-            className={styles.sponsor}
-            logo="isotype"
-          />
-        </div>
-
-        <CreatorsCredit />
+        <CreatorsCredit variant="footer" />
       </div>
     </footer>
   );
