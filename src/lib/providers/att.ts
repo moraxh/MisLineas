@@ -214,10 +214,12 @@ export async function lookupCURPInATT(curp: string): Promise<LineResult> {
     executablePath = process.env.CHROME_PATH;
     extraArgs = [];
   } else {
-    const { default: chromium } = await import("@sparticuz/chromium-min");
-    executablePath = await chromium.executablePath(
-      "https://github.com/Sparticuz/chromium/releases/download/v149.0.0/chromium-v149.0.0-pack.x64.tar",
-    );
+    // The full package (not -min) bundles the Chromium binary in the
+    // function itself instead of fetching it from GitHub Releases on every
+    // cold start (~13s measured locally) — worth the extra ~65MB in the
+    // deploy bundle, comfortably under Vercel's 250MB function limit.
+    const { default: chromium } = await import("@sparticuz/chromium");
+    executablePath = await chromium.executablePath();
     extraArgs = chromium.args;
   }
 

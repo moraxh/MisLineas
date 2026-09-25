@@ -2,7 +2,13 @@ export const runtime = "nodejs";
 // Vercel Hobby plan caps Node.js functions at 60s; raise this only if the
 // project moves to Pro (up to 300s), which would also give AT&T's Puppeteer
 // path more headroom to retry before the request itself times out.
-export const maxDuration = 60;
+// Vercel Pro allows up to 300s for Node.js functions. AT&T's Puppeteer path
+// alone can reach ~65s per attempt (50s page.goto + 15s cookie wait) before
+// even counting cold-start or proxy latency, and it retries up to 3 times —
+// on the Hobby plan's 60s cap a single slow attempt kills the whole request
+// (every other provider included), which is exactly what happened in
+// production before this was raised.
+export const maxDuration = 300;
 
 import type { NextRequest } from "next/server";
 import { corsHeaders, corsPreflight } from "@/lib/cors";
