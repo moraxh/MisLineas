@@ -1,103 +1,89 @@
-"use client";
-
-import {
-  ArrowLeft,
-  Coffee,
-  HeartHandshake,
-  Server,
-  Shield,
-  Users,
-} from "lucide-react";
-import { motion } from "motion/react";
+import { ArrowLeft, ExternalLink, Github, HeartHandshake } from "lucide-react";
 import Link from "next/link";
+import { SponsorLink } from "@/components/home/SponsorLink";
+import styles from "./page.module.css";
 
-const KOFI_URL = "https://ko-fi.com/moraxh";
+const VELAR_URL = "https://velartech.com.mx/";
 
 export default function DonarPage() {
   return (
-    <div className="min-h-screen bg-[linear-gradient(180deg,#fafaf9_0%,#f4f4f5_40%,#ffffff_100%)] font-sans text-zinc-900">
-      <div className="mx-auto flex min-h-screen max-w-xl flex-col px-4 py-12 sm:px-6">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" /> Volver al inicio
+    <div className={styles.page}>
+      <main className={styles.main}>
+        <Link href="/" className={styles.backLink}>
+          <ArrowLeft className={styles.backIcon} />
+          Volver al inicio
         </Link>
 
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex flex-1 flex-col items-center justify-center gap-8 text-center"
-        >
-          <div className="flex items-center justify-center w-14 h-14 rounded-full bg-pink-50 text-pink-600">
-            <HeartHandshake className="w-7 h-7" />
+        <section className={styles.hero} aria-labelledby="support-heading">
+          <div className={styles.heroIcon}>
+            <HeartHandshake
+              className={styles.heroIconGraphic}
+              aria-hidden="true"
+            />
           </div>
-
-          <div className="space-y-3">
-            <h1 className="text-2xl font-bold tracking-tight text-zinc-950 sm:text-3xl">
-              Apoya MisLíneas
-            </h1>
-            <p className="max-w-md text-sm leading-7 text-zinc-600 sm:text-base">
-              MisLíneas es un proyecto ciudadano independiente, sin anuncios y
-              sin fines de lucro. Consulta en tiempo real si tu CURP está
-              registrada en alguna operadora, completamente gratis.
-            </p>
-          </div>
-
-          <div className="w-full rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm">
-            <div className="flex items-center gap-3 mb-4">
-              <Users className="w-4 h-4 text-zinc-400" />
-              <span className="text-sm font-medium text-zinc-700">
-                Más de <span className="font-bold text-zinc-950">150,000</span>{" "}
-                consultas realizadas
-              </span>
-            </div>
-            <p className="text-xs text-zinc-400 text-left">
-              Cada consulta hace múltiples llamadas en tiempo real a los
-              portales de las operadoras.
-            </p>
-          </div>
-
-          <div className="w-full space-y-3">
-            <p className="text-xs font-semibold uppercase tracking-widest text-zinc-400">
-              Costos mensuales
-            </p>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-zinc-200 bg-white p-4 text-left shadow-sm">
-                <Server className="w-4 h-4 text-zinc-400 mb-2" />
-                <p className="text-xs text-zinc-500">Hosting</p>
-                <p className="text-lg font-bold text-zinc-900">$0 USD</p>
-                <p className="text-[11px] text-zinc-400 mt-1">
-                  Migramos a un plan gratuito
-                </p>
-              </div>
-              <div className="rounded-xl border border-zinc-200 bg-white p-4 text-left shadow-sm">
-                <Shield className="w-4 h-4 text-zinc-400 mb-2" />
-                <p className="text-xs text-zinc-500">Proxies</p>
-                <p className="text-lg font-bold text-zinc-900">$10 USD</p>
-              </div>
-            </div>
-            <div className="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-3 flex justify-between items-center">
-              <span className="text-sm text-zinc-500">Total mensual</span>
-              <span className="text-sm font-bold text-zinc-900">$10 USD</span>
-            </div>
-          </div>
-
-          <a
-            href={KOFI_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-lg bg-pink-600 px-6 py-3 text-sm font-medium text-white shadow-sm transition-colors hover:bg-pink-700"
-          >
-            <Coffee className="w-4 h-4" />
-            Donar en Ko-fi
-          </a>
-
-          <p className="text-xs text-zinc-400">
-            Las donaciones son voluntarias. MisLíneas seguirá siendo gratuito.
+          <p className={styles.eyebrow}>Respaldo del proyecto</p>
+          <h1 id="support-heading" className={styles.title}>
+            MisLíneas ya cuenta con respaldo
+          </h1>
+          <p className={styles.description}>
+            Velar Technologies cubre actualmente todos los gastos de
+            infraestructura y mantenimiento del servicio. Por eso, no necesitas
+            hacer una donación para que MisLíneas siga disponible de forma
+            gratuita.
           </p>
-        </motion.div>
-      </div>
+        </section>
+
+        <section
+          className={styles.supportCard}
+          aria-label="Respaldo y formas de apoyo"
+        >
+          <div className={styles.sponsorPanel}>
+            <div className={styles.panelCopy}>
+              <p className={styles.panelLabel}>Respaldo actual</p>
+              <p className={styles.panelText}>
+                Velar Technologies cubre la infraestructura y el mantenimiento
+                de MisLíneas.
+              </p>
+            </div>
+            <SponsorLink variant="page" />
+          </div>
+
+          <div className={styles.projectPanel}>
+            <div className={styles.panelCopy}>
+              <p className={styles.panelLabel}>Apoyo al proyecto</p>
+              <p className={styles.panelText}>
+                No necesitas donar. Si quieres ayudar, puedes compartir el
+                servicio, reportar errores o contribuir en{" "}
+                <a
+                  href="https://github.com/moraxh/MisLineas"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.inlineLink}
+                >
+                  GitHub
+                  <Github className={styles.inlineIcon} aria-hidden="true" />
+                </a>
+                .
+              </p>
+            </div>
+            <a
+              href={VELAR_URL}
+              target="_blank"
+              rel="sponsored noopener"
+              referrerPolicy="strict-origin-when-cross-origin"
+              className={styles.projectLink}
+            >
+              Conocer a Velar Technologies
+              <ExternalLink className={styles.inlineIcon} aria-hidden="true" />
+            </a>
+          </div>
+        </section>
+
+        <p className={styles.thanks}>
+          Gracias por usar el servicio y por compartirlo con quien pueda
+          necesitarlo.
+        </p>
+      </main>
     </div>
   );
 }

@@ -1,0 +1,20 @@
+.section {
+  width: 100%;
+  max-width: 960px;
+  margin-inline: auto;
+  color: #263238;
+}
+
+.heading {
+  margin: 0 0 24px;
+  color: #263238;
+  font-size: clamp(1.8rem, 3vw, 2.25rem);
+  font-weight: 630;
+  letter-spacing: -0.05em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.items {
+  display: flow-root;
+}

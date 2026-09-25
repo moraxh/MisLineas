@@ -1,0 +1,280 @@
+.footer {
+  padding: clamp(42px, 5vw, 60px) 24px 24px;
+  border-top: 1px solid #e1e6e8;
+  background: #f8fafb;
+  color: #69777f;
+}
+
+.inner {
+  width: min(100%, 1160px);
+  margin-inline: auto;
+}
+
+.main {
+  display: grid;
+  grid-template-columns: minmax(250px, 0.9fr) minmax(0, 1.35fr);
+  align-items: start;
+  gap: clamp(48px, 10vw, 148px);
+}
+
+.identity {
+  max-width: 350px;
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  color: #1e343b;
+  font-size: 1.35rem;
+  font-weight: 750;
+  letter-spacing: -0.045em;
+}
+
+.brand img {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+}
+
+.identity p {
+  max-width: 31ch;
+  margin: 16px 0 0;
+  color: #68777f;
+  font-size: 0.92rem;
+  line-height: 1.7;
+}
+
+.links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(20px, 4vw, 48px);
+}
+
+.linksArea {
+  display: grid;
+  gap: 24px;
+}
+
+.linksIntro {
+  width: min(100%, 500px);
+  max-width: 500px;
+  margin-inline-start: auto;
+  text-align: right;
+}
+
+.linksIntro h2 {
+  margin: 0;
+  color: #263238;
+  font-size: clamp(1.2rem, 2vw, 1.5rem);
+  font-weight: 680;
+  letter-spacing: -0.035em;
+  line-height: 1.2;
+}
+
+.linksIntro p {
+  max-width: 46ch;
+  margin: 8px 0 0 auto;
+  color: #68777f;
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.links a {
+  display: grid;
+  min-height: 88px;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 10px;
+  padding: 14px 0 0;
+  border-top: 1px solid #dce7eb;
+  color: #263238;
+  line-height: 1.4;
+  text-decoration: none;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease,
+    translate 180ms ease;
+}
+
+.links a:hover {
+  border-color: #8bcfc4;
+  color: #087d70;
+  translate: 0 -1px;
+}
+
+.linkIcon {
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 10px;
+  background: #e7f5f2;
+  color: #087d70;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
+}
+
+.linkIcon svg {
+  width: 16px;
+  height: 16px;
+}
+
+.links a:hover .linkIcon {
+  background: #d2eee8;
+  color: #06655b;
+}
+
+.linkCopy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.linkName {
+  color: inherit;
+  font-size: 0.88rem;
+  font-weight: 680;
+}
+
+.linkDescription {
+  overflow-wrap: anywhere;
+  color: #89949a;
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.linkArrow {
+  width: 15px;
+  height: 15px;
+  color: #89949a;
+  transition:
+    translate 180ms ease,
+    color 180ms ease;
+}
+
+.links a:hover .linkArrow {
+  color: #087d70;
+  translate: 2px -2px;
+}
+
+.links a:focus-visible,
+.support:focus-visible,
+.sponsor:focus-visible {
+  border-radius: 8px;
+  outline: 2px solid #007aff;
+  outline-offset: 4px;
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 16px;
+  margin-top: clamp(32px, 4vw, 52px);
+  padding-top: 18px;
+  border-top: 1px solid #dce7eb;
+}
+
+.meta p {
+  margin: 0;
+  color: #89949a;
+  font-size: 0.72rem;
+  line-height: 1.55;
+}
+
+.support,
+.sponsor {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 24px;
+  text-decoration: none;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    translate 180ms ease;
+}
+
+.support {
+  color: #087d70;
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.support:hover {
+  color: #065e57;
+  translate: 0 -1px;
+}
+
+.sponsor {
+  color: #69777f;
+}
+
+.sponsor:hover {
+  color: #263238;
+  translate: 0 -2px;
+}
+
+@media (max-width: 760px) {
+  .main {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .identity {
+    max-width: 420px;
+  }
+}
+
+@media (max-width: 560px) {
+  .footer {
+    padding-inline: 20px;
+  }
+
+  .links {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 20px;
+  }
+
+  .links a {
+    min-height: 64px;
+  }
+
+  .linksArea {
+    gap: 20px;
+  }
+
+  .meta {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 14px;
+  }
+
+  .support,
+  .sponsor {
+    justify-self: start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .links a,
+  .support,
+  .sponsor {
+    transition: none;
+  }
+
+  .links a:hover,
+  .support:hover,
+  .sponsor:hover {
+    translate: none;
+  }
+
+  .links a:hover .linkIcon,
+  .links a:hover .linkArrow {
+    translate: none;
+  }
+}

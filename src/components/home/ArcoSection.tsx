@@ -1,57 +1,64 @@
-import { ShieldAlert } from "lucide-react";
+import { ArrowUpRight, CircleAlert } from "lucide-react";
 import { ARCO_RIGHTS } from "@/lib/data/content";
+import styles from "./ArcoSection.module.css";
+
+const LAW_URL = "https://www.diputados.gob.mx/LeyesBiblio/pdf/LFPDPPP.pdf";
+const CRT_REPORT_URL =
+  "https://portal.crt.gob.mx/reporte-fallas-plataforma-registro";
 
 export function ArcoSection() {
   return (
-    <div className="pt-4">
-      <div className="grid md:grid-cols-2 gap-6 items-start">
-        <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6">
-          <p className="text-sm text-zinc-600 mb-6 leading-relaxed">
-            La Ley Federal de Protección de Datos Personales en Posesión de los
-            Particulares (LFPDPPP) te permite ejercer derechos ARCO ante
-            cualquier operadora. Tienes total soberanía sobre el uso de tu
-            identidad.
-          </p>
-          <div className="grid grid-cols-2 gap-4">
-            {ARCO_RIGHTS.map((a) => (
-              <div
-                key={a.t}
-                className="bg-white p-4 rounded-xl border border-zinc-200"
-              >
-                <h4 className="font-semibold text-sm text-zinc-900 mb-1">
-                  {a.t}
-                </h4>
-                <p className="text-xs text-zinc-500">{a.d}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+    <div className={styles.content}>
+      <div className={styles.intro}>
+        <h3>Sobre tus datos, tú decides.</h3>
+        <p>
+          Puedes ejercer estos derechos directamente ante tu operadora, conforme
+          a la ley.
+        </p>
+      </div>
 
-        <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 flex flex-col justify-between h-full">
+      <dl className={styles.rights}>
+        {ARCO_RIGHTS.map((right) => (
+          <div className={styles.right} key={right.t}>
+            <span className={styles.initial} aria-hidden="true">
+              {right.t[0]}
+            </span>
+            <dt>{right.t}</dt>
+            <dd>{right.d}</dd>
+          </div>
+        ))}
+      </dl>
+
+      <div className={styles.followUp}>
+        <div className={styles.followUpCopy}>
+          <CircleAlert size={20} aria-hidden="true" />
           <div>
-            <div className="flex items-center gap-3 mb-4">
-              <ShieldAlert className="w-6 h-6 text-red-500" />
-              <h3 className="font-semibold text-zinc-900">
-                ¿Detectaste una línea desconocida?
-              </h3>
-            </div>
-            <p className="text-sm text-zinc-600 leading-relaxed mb-6">
-              Este es un problema grave. Alguien podría estar usando tu
-              identidad para cometer delitos o fraudes. Tienes el derecho,
-              conforme a la LFPDPPP, de exigir la cancelación inmediata y
-              levantar un reporte formal ante la operadora.
+            <h3>¿No reconoces una línea?</h3>
+            <p>
+              Solicita la aclaración o desvinculación directamente con la
+              operadora.
             </p>
           </div>
-          <div className="space-y-3 mt-auto">
-            <a
-              href="https://portal.crt.gob.mx/reporte-fallas-plataforma-registro"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full bg-red-600 hover:bg-red-700 text-white font-medium py-3 px-4 rounded-xl flex items-center justify-center gap-2 transition-colors text-sm"
-            >
-              <ShieldAlert className="w-4 h-4" /> Entrar al portal del CRT
-            </a>
-          </div>
+        </div>
+        <div className={styles.actions}>
+          <a
+            className={styles.lawLink}
+            href={LAW_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Consultar la ley
+            <ArrowUpRight size={15} aria-hidden="true" />
+          </a>
+          <a
+            className={styles.reportLink}
+            href={CRT_REPORT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Reportar una falla en la CRT
+            <ArrowUpRight size={17} aria-hidden="true" />
+          </a>
         </div>
       </div>
     </div>

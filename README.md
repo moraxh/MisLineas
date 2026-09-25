@@ -17,7 +17,7 @@ Dependiendo de la operadora, el proceso puede implicar entrar a decenas de porta
 
 MisLíneas nace para resolver ese problema en una sola consulta.
 
-La aplicación revisa en paralelo los mecanismos de verificación disponibles de operadores y OMVs, y muestra los resultados conforme cada proveedor responde. Después de más de 150,000 consultas, el objetivo sigue siendo simple: ayudar a cualquier persona a revisar qué líneas aparecen registradas a su nombre sin tener que navegar por más de cien sitios distintos.
+La aplicación revisa en paralelo los mecanismos de verificación disponibles de operadores y OMVs, y muestra los resultados conforme cada proveedor responde. Después de más de 250,000 consultas, el objetivo sigue siendo simple: ayudar a cualquier persona a revisar qué líneas aparecen registradas a su nombre sin tener que navegar por más de cien sitios distintos.
 
 ---
 
@@ -43,10 +43,9 @@ MisLíneas intenta cerrar ese vacío.
 Actualmente incluye soporte para:
 
 - Telcel
+- AT&T, Unefon y WIM marca digital AT&T
 - operadores sobre Red Altán (~65 marcas)
 - más de 80 OMVs en México
-
-AT&T está deshabilitado por el momento: su verificación requiere un navegador completo detrás de un proxy residencial, lo que representaba ~95% del consumo de ancho de banda del proxy para una sola operadora.
 
 La lista completa y el estado de compatibilidad de cada operador se encuentra en [OPERATORS.md](OPERATORS.md).
 
@@ -60,7 +59,11 @@ Las consultas se ejecutan en paralelo utilizando `Promise.allSettled`, mientras 
 
 ## Infraestructura
 
-El frontend se despliega en Vercel y el backend corre en Docker sobre un servidor propio (Oracle Cloud), comunicándose vía CORS y actualizándose automáticamente con cada nueva versión publicada.
+La aplicación completa (frontend y API) se despliega en Vercel, incluyendo las consultas que requieren un navegador headless (Puppeteer + Chromium serverless).
+
+Velar Technologies cubre actualmente todos los gastos de infraestructura y
+mantenimiento del servicio. MisLíneas sigue siendo gratuito, independiente y
+sin fines de lucro.
 
 ---
 
@@ -86,6 +89,9 @@ pnpm start
 ```
 
 Variables de entorno: ver [`.env.example`](.env.example).
+
+Protección de consultas: ver [configuración de Cloudflare Turnstile](docs/turnstile.md).
+La API requiere una verificación válida antes de consultar proveedores.
 
 ---
 

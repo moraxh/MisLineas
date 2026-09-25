@@ -1,0 +1,22 @@
+.lookup {
+  display: grid;
+  width: min(100%, 768px);
+  gap: 16px;
+  margin: clamp(36px, 5vw, 56px) auto 0;
+}
+
+.results {
+  width: min(100%, 960px);
+  margin: 42px auto 0;
+}
+
+@media (max-width: 639px) {
+  .lookup {
+    gap: 13px;
+    margin-top: 34px;
+  }
+
+  .results {
+    margin-top: 32px;
+  }
+}

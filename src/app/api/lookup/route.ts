@@ -1,8 +1,12 @@
 export const runtime = "nodejs";
-export const maxDuration = 120;
+// Vercel Hobby plan caps Node.js functions at 60s; raise this only if the
+// project moves to Pro (up to 300s), which would also give AT&T's Puppeteer
+// path more headroom to retry before the request itself times out.
+export const maxDuration = 60;
 
 import type { NextRequest } from "next/server";
 import { corsHeaders, corsPreflight } from "@/lib/cors";
+import { isLocalLookup } from "@/lib/local-access";
 import {
   lookupCURPINMobig,
   lookupCURPInABIB,
@@ -19,9 +23,11 @@ import {
   loookupCURPInTalentoNetMVNO,
   loookupCURPInVirginMobile,
 } from "@/lib/providers";
+import { lookupCURPInATT } from "@/lib/providers/att";
 import { validateCURP } from "@/lib/providers/curp";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { stripCURPs } from "@/lib/sanitize";
+import { verifyTurnstile } from "@/lib/turnstile";
 import type { LineResult } from "@/types";
 
 // Firing every provider at once means a dozen simultaneous name resolutions —
@@ -46,13 +52,13 @@ const providers: Array<{
   provider: string;
   lookupFunction: (curp: string) => Promise<LineResult | LineResult[]>;
 }> = [
-  // {
-  //   provider: "AT&T",
-  //   lookupFunction: lookupCURPInATT,
-  //   // Disabled: ~170-800KB per lookup (full browser + Shape's common.js on
-  //   // every call) — ~95% of MisLineas's residential-proxy bandwidth. All other
-  //   // providers cost ~7-8KB. Not worth the proxy budget vs the rest.
-  // },
+  {
+    provider: "AT&T",
+    lookupFunction: lookupCURPInATT,
+    // Re-enabled: Velar Technologies' sponsorship now covers the
+    // residential-proxy bandwidth this provider needs (~170-800KB per lookup,
+    // full browser + Shape's common.js on every call, vs ~7-8KB for the rest).
+  },
   {
     provider: "Telcel",
     lookupFunction: lookupCURPInTelcel,
@@ -139,7 +145,7 @@ export async function POST(req: NextRequest) {
   const cors = corsHeaders(req);
   const ip =
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
-  const { allowed, remaining } = checkRateLimit(ip);
+  const { allowed, remaining } = await checkRateLimit(ip);
 
   if (!allowed) {
     return new Response(JSON.stringify({ error: "Too many requests" }), {
@@ -148,7 +154,22 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const { curp } = await req.json();
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json(
+      { error: "Invalid JSON body" },
+      { status: 400, headers: cors },
+    );
+  }
+  if (!body || typeof body !== "object" || !("curp" in body)) {
+    return Response.json(
+      { error: "CURP is required" },
+      { status: 400, headers: cors },
+    );
+  }
+  const { curp } = body;
 
   if (!curp || typeof curp !== "string") {
     return new Response(
@@ -164,6 +185,19 @@ export async function POST(req: NextRequest) {
       status: 400,
       headers: cors,
     });
+  }
+
+  const local = isLocalLookup(req);
+  const verification = local
+    ? { success: true as const }
+    : await verifyTurnstile(
+        "turnstileToken" in body ? body.turnstileToken : undefined,
+      );
+  if (!verification.success) {
+    return Response.json(
+      { error: verification.error },
+      { status: verification.status, headers: cors },
+    );
   }
 
   // Use a streaming response to return results as soon as they resolve

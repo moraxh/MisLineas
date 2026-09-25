@@ -48,10 +48,7 @@ function generateJWT() {
     JSON.stringify({ sub: "PRB", iat: now, exp: now + 3600 }),
   ).toString("base64url");
 
-  const signature = crypto
-    .randomBytes(32)
-    .toString("base64url")
-    .slice(0, 43);
+  const signature = crypto.randomBytes(32).toString("base64url").slice(0, 43);
 
   return `${header}.${payload}.${signature}`;
 }
@@ -154,8 +151,25 @@ async function postJSON<T>(
   });
 }
 
+// Telcel's WAF (Shape/Akamai-style bot filter) rejects requests it flags as
+// automated with a 403 and this specific error code, rather than any real
+// authorization failure (there's no legitimate "wrong credentials" 403 case
+// here since this is an unauthenticated public lookup form). Treat it the
+// same as a network/5xx blip: retry with a fresh proxy pick, since the block
+// is tied to the request fingerprint/IP, not the CURP being looked up.
+const WAF_BLOCK_ERROR_CODE = "ESE_CBI_CON_0012";
+
+function isWAFBlock(raw: string) {
+  return raw.includes(WAF_BLOCK_ERROR_CODE);
+}
+
 function isRetryableResponse(status: number, raw: string) {
-  return status === 0 || status >= 500 || raw === "timeout";
+  return (
+    status === 0 ||
+    status >= 500 ||
+    raw === "timeout" ||
+    (status === 403 && isWAFBlock(raw))
+  );
 }
 
 async function validateEligibility(curp: string) {

@@ -1,72 +1,57 @@
+"use client";
+
 import { ChevronDown } from "lucide-react";
-import { AnimatePresence, motion } from "motion/react";
-import { type ReactNode, useEffect, useState } from "react";
+import { type ReactNode, useId } from "react";
+import styles from "./AccordionItem.module.css";
 
 interface AccordionItemProps {
-  id?: string;
+  id: string;
   title: string;
   children: ReactNode;
-  defaultOpen?: boolean;
+  isOpen: boolean;
+  onToggle: () => void;
 }
 
 export function AccordionItem({
   id,
   title,
   children,
-  defaultOpen = false,
+  isOpen,
+  onToggle,
 }: AccordionItemProps) {
-  const [isOpen, setIsOpen] = useState(defaultOpen);
-
-  useEffect(() => {
-    if (!id) return;
-
-    const syncWithHash = () => {
-      if (window.location.hash === `#${id}`) {
-        setIsOpen(true);
-      }
-    };
-
-    syncWithHash();
-    window.addEventListener("hashchange", syncWithHash);
-
-    return () => {
-      window.removeEventListener("hashchange", syncWithHash);
-    };
-  }, [id]);
+  const uniqueId = useId();
+  const triggerId = `information-trigger-${uniqueId}`;
+  const panelId = `information-panel-${uniqueId}`;
 
   return (
-    <div
-      id={id}
-      className="border border-zinc-200 bg-white rounded-2xl overflow-hidden shadow-sm scroll-mt-24"
-    >
+    <div id={id} className={styles.item}>
       <button
+        id={triggerId}
+        className={styles.trigger}
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full text-left px-6 py-5 flex items-center justify-between font-semibold text-zinc-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-900"
         aria-expanded={isOpen}
+        aria-controls={panelId}
+        onClick={onToggle}
       >
-        {title}
-        <motion.div
-          animate={{ rotate: isOpen ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          <ChevronDown className="w-5 h-5 text-zinc-400" />
-        </motion.div>
+        <span>{title}</span>
+        <ChevronDown
+          className={`${styles.chevron} ${isOpen ? styles.chevronOpen : ""}`}
+          size={20}
+          aria-hidden="true"
+        />
       </button>
-      <AnimatePresence initial={false}>
-        {isOpen && (
-          <motion.div
-            initial={{ height: 0, opacity: 0 }}
-            animate={{ height: "auto", opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2, ease: "easeInOut" }}
-          >
-            <div className="px-6 pb-6 pt-0 border-t border-zinc-100">
-              {children}
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+      <section
+        id={panelId}
+        className={`${styles.panel} ${isOpen ? styles.panelOpen : ""}`}
+        aria-labelledby={triggerId}
+        aria-hidden={!isOpen}
+        inert={!isOpen}
+      >
+        <div className={styles.panelInner}>
+          <div className={styles.panelContent}>{children}</div>
+        </div>
+      </section>
     </div>
   );
 }

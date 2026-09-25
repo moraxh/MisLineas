@@ -1,6 +1,6 @@
-import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import { createCipheriv } from "node:crypto";
 import { ProxyAgent, fetch as undiciFetch } from "undici";
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import { getResidentialProxyUrl } from "@/lib/proxy";
 import { stripCURPs } from "@/lib/sanitize";
 import type { LineResult } from "@/types";
@@ -50,14 +50,12 @@ type FetchResult =
   | { ok: true; data: Record<string, unknown> }
   | { ok: false; transient: boolean; status?: number };
 
-async function fetchSubscriptions(
-  encryptedCURP: string,
-): Promise<FetchResult> {
+async function fetchSubscriptions(encryptedCURP: string): Promise<FetchResult> {
   const url =
     "https://vinculatulinea.com/omv-lineas/v1/omv-services/subscriptions-by-curp?pathName=freedompop&apiName=getSubscriptionsbyCURP";
   const auth = Buffer.from("admin:admin123").toString("base64");
   const response = await undiciFetch(url, {
-      signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
+    signal: AbortSignal.timeout(PROVIDER_TIMEOUT_MS),
     method: "GET",
     dispatcher: getProxyAgent(),
     headers: {
@@ -83,7 +81,10 @@ async function fetchSubscriptions(
     },
   });
 
-  const data = await response.json().catch(() => null) as Record<string, unknown> | null;
+  const data = (await response.json().catch(() => null)) as Record<
+    string,
+    unknown
+  > | null;
 
   if (!response.ok) {
     console.error(
@@ -169,7 +170,7 @@ export async function lookupCURPInFreedompop(
       .trim();
     const brand = BRAND_MAP[raw.toLowerCase()] ?? raw;
     if (!byBrand.has(brand)) byBrand.set(brand, []);
-    byBrand.get(brand)!.push(sub.msisdn);
+    byBrand.get(brand)?.push(sub.msisdn);
   }
 
   return FREEDOMPOP_PROVIDERS.map((company) => {

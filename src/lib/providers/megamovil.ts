@@ -67,7 +67,8 @@ export async function lookupCURPInMegamovil(curp: string): Promise<LineResult> {
   return {
     company: "Mega Móvil",
     lines: [],
-    error: "Mega Móvil requiere un número de línea específico para confirmar vinculación; no se puede listar por CURP.",
+    error:
+      "Mega Móvil requiere un número de línea específico para confirmar vinculación; no se puede listar por CURP.",
     rawApiResponse: validationData,
   };
 }

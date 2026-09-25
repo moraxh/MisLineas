@@ -1,11 +1,83 @@
 "use client";
 
-import { ExternalLink, Flag, MessageSquareWarning, Phone } from "lucide-react";
+import {
+  Check,
+  CheckCircle2,
+  CircleDashed,
+  Copy,
+  ExternalLink,
+  Flag,
+  MessageSquareWarning,
+  TriangleAlert,
+} from "lucide-react";
 import { motion } from "motion/react";
-import { CopyButton } from "@/components/ui/CopyButton";
+import { useState } from "react";
 import { getProviderWebsite } from "@/lib/data/providerWebsites";
-import { cn } from "@/lib/utils";
 import type { DisplayLine } from "@/types";
+import styles from "./ResultsPanel.module.css";
+
+type ResultState =
+  | "confirmed"
+  | "possible"
+  | "notFound"
+  | "error"
+  | "unavailable";
+
+function getResultState(linea: DisplayLine): ResultState {
+  if (linea.isPossible) return "possible";
+  if (linea.isNotFound) return "notFound";
+  if (linea.isError) return "error";
+  if (linea.isUnavailable) return "unavailable";
+  return "confirmed";
+}
+
+function getStateCopy(state: ResultState) {
+  switch (state) {
+    case "possible":
+      return {
+        label: "Posible",
+        hint: "Coincidencia por confirmar",
+        icon: CircleDashed,
+      };
+    case "notFound":
+      return {
+        label: "Sin registro",
+        hint: "No se encontró vinculación",
+        icon: CircleDashed,
+      };
+    case "error":
+      return {
+        label: "Error",
+        hint: "La consulta no terminó",
+        icon: TriangleAlert,
+      };
+    case "unavailable":
+      return {
+        label: "No disponible",
+        hint: "La operadora no respondió",
+        icon: TriangleAlert,
+      };
+    default:
+      return {
+        label: "Confirmada",
+        hint: "Línea vinculada a esta CURP",
+        icon: CheckCircle2,
+      };
+  }
+}
+
+function getMonogram(operator: string) {
+  const words = operator
+    .replace(/[^A-Za-zÁÉÍÓÚÜÑ0-9 ]/g, "")
+    .split(/\s+/)
+    .filter(Boolean);
+
+  if (words.length > 1) {
+    return `${words[0][0]}${words[1][0]}`.toUpperCase();
+  }
+
+  return operator.slice(0, 2).toUpperCase();
+}
 
 interface Props {
   linea: DisplayLine;
@@ -14,122 +86,129 @@ interface Props {
 }
 
 export function LineCard({ linea, idx, onReport }: Props) {
+  const [copied, setCopied] = useState(false);
+  const state = getResultState(linea);
+  const stateCopy = getStateCopy(state);
+  const StateIcon = stateCopy.icon;
   const hasVisibleNumber =
-    linea.numero !== "Número no confirmado" && linea.numero !== "Número oculto";
-  const isConfirmed =
-    !linea.isPossible &&
-    !linea.isNotFound &&
-    !linea.isError &&
-    !linea.isUnavailable &&
-    hasVisibleNumber;
-  const isRegisteredWithoutVisibleNumber =
-    !linea.isPossible &&
-    !linea.isNotFound &&
-    !linea.isError &&
-    !linea.isUnavailable &&
-    !hasVisibleNumber;
-  const website = isConfirmed ? getProviderWebsite(linea.operadora) : null;
+    linea.numero !== "Número no confirmado" &&
+    linea.numero !== "Número oculto" &&
+    linea.numero !== "Sin registro" &&
+    linea.numero !== "Temporalmente no disponible" &&
+    linea.numero !== "Error al consultar";
+  const canReport =
+    state === "confirmed" || state === "possible" || state === "error";
+  const website =
+    state === "confirmed" ? getProviderWebsite(linea.operadora) : null;
+
+  const handleCopy = async () => {
+    if (!hasVisibleNumber) return;
+
+    try {
+      await navigator.clipboard.writeText(linea.numero);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
+    <motion.article
+      initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -8 }}
-      transition={{ duration: 0.22, delay: Math.min(idx * 0.04, 0.3) }}
-      className="bg-white border border-zinc-200 shadow-sm p-4 sm:p-5 rounded-2xl flex items-center justify-between gap-4"
+      transition={{ duration: 0.22, delay: Math.min(idx * 0.045, 0.25) }}
+      className={styles.resultCard}
     >
-      <div className="flex items-center gap-4 min-w-0">
-        <div className="w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center shrink-0">
-          <Phone className="w-5 h-5 text-zinc-500" />
-        </div>
-        <div>
-          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mb-0.5">
-            <span className="font-semibold text-zinc-900">
-              {linea.operadora}
+      <div className={styles.cardMain}>
+        <span className={styles.operatorMark} aria-hidden="true">
+          {getMonogram(linea.operadora)}
+        </span>
+        <div className={styles.cardContent}>
+          <div className={styles.operatorLine}>
+            <h3 className={styles.operatorName}>{linea.operadora}</h3>
+            <span
+              className={`${styles.statusBadge} ${styles[`status${state.charAt(0).toUpperCase()}${state.slice(1)}`]}`}
+            >
+              <StateIcon aria-hidden="true" />
+              {stateCopy.label}
             </span>
-            {linea.isPossible ? (
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-amber-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />{" "}
-                Posible
-              </span>
-            ) : linea.isNotFound ? (
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500">
-                <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" /> No
-                encontrada
-              </span>
-            ) : linea.isError ? (
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-red-600">
-                <span className="h-1.5 w-1.5 rounded-full bg-red-500" /> Error
-              </span>
-            ) : linea.isUnavailable ? (
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-orange-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-orange-500" /> No
-                disponible
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-700">
-                <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />{" "}
-                Registrada
-              </span>
-            )}
           </div>
+          {state !== "confirmed" && (
+            <p className={styles.cardHint}>{stateCopy.hint}</p>
+          )}
+        </div>
+
+        <div className={styles.numberBlock}>
           <p
-            className={cn(
-              "font-mono text-base text-zinc-600",
-              !hasVisibleNumber && "italic text-sm text-zinc-400",
-              (linea.isNotFound || linea.isError || linea.isUnavailable) &&
-                "italic text-sm text-zinc-400",
-            )}
+            className={`${styles.number} ${hasVisibleNumber ? "" : styles.numberMuted}`}
           >
             {linea.numero}
           </p>
           {linea.disclaimer && (
-            <p className="mt-1 max-w-xl text-xs leading-5 text-amber-700">
-              {linea.disclaimer}
-            </p>
+            <p className={styles.disclaimer}>{linea.disclaimer}</p>
           )}
         </div>
       </div>
 
-      <div className="flex items-center gap-1 shrink-0">
-        {isConfirmed && <CopyButton text={linea.numero} />}
-        {(isConfirmed ||
-          linea.isPossible ||
-          isRegisteredWithoutVisibleNumber) && (
+      <div className={styles.cardActions}>
+        {hasVisibleNumber && (
           <button
             type="button"
-            onClick={() => onReport(linea.operadora)}
-            className="p-2 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
-            aria-label={`Desconocer línea de ${linea.operadora}`}
-            title="Desconocer / Derechos ARCO"
+            className={styles.copyButton}
+            data-copied={copied}
+            onClick={handleCopy}
+            aria-label={
+              copied ? "Número copiado" : `Copiar número de ${linea.operadora}`
+            }
+            title={copied ? "Copiado" : "Copiar número"}
           >
-            <Flag className="w-4 h-4" />
+            {copied ? (
+              <Check size={16} aria-hidden="true" />
+            ) : (
+              <Copy size={16} aria-hidden="true" />
+            )}
           </button>
         )}
-        {(linea.isError || linea.isNotFound || linea.isUnavailable) && (
+        {canReport && (
+          <button
+            type="button"
+            className={styles.cardAction}
+            onClick={() => onReport(linea.operadora)}
+            aria-label={`Desconocer línea de ${linea.operadora}`}
+            title="Desconocer línea / Derechos ARCO"
+          >
+            <Flag size={16} aria-hidden="true" />
+          </button>
+        )}
+        {(state === "error" ||
+          state === "notFound" ||
+          state === "unavailable") && (
           <a
             href="https://docs.google.com/forms/d/e/1FAIpQLSdI1KnQDXHA6lnAD29JZLokvf5NRCeLb_wPuTiDQ1bs8os6_A/viewform"
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 text-zinc-400 hover:text-blue-500 hover:bg-blue-50 rounded-xl transition-colors"
+            className={styles.cardAction}
             aria-label={`Reportar problema con ${linea.operadora}`}
-            title="Ayúdenos reportando este problema"
+            title="Reportar problema"
           >
-            <MessageSquareWarning className="w-4 h-4" />
+            <MessageSquareWarning size={16} aria-hidden="true" />
           </a>
         )}
-        {website && isConfirmed && (
+        {website && (
           <a
             href={website}
             target="_blank"
             rel="noopener noreferrer"
-            className="p-2 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors"
+            className={styles.cardAction}
             aria-label={`Ir al sitio de ${linea.operadora}`}
+            title="Sitio de la operadora"
           >
-            <ExternalLink className="w-4 h-4" />
+            <ExternalLink size={16} aria-hidden="true" />
           </a>
         )}
       </div>
-    </motion.div>
+    </motion.article>
   );
 }
