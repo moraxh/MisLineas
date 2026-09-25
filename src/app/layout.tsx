@@ -64,9 +64,9 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/preview.jpg",
-        width: 1912,
-        height: 964,
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 628,
         alt: "MisLíneas, consulta líneas telefónicas vinculadas a tu CURP",
       },
     ],
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: siteTitle,
     description: siteDescription,
-    images: ["/preview.jpg"],
+    images: ["/og-image.jpg"],
   },
   icons: [
     {
