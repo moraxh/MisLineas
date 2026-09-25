@@ -20,8 +20,8 @@ export function SponsorSection() {
           cubrirlos para mantener las consultas gratuitas.
         </p>
       </div>
-      <aside className={styles.sponsor} aria-label="Respaldo actual">
-        <p className={styles.sponsorLabel}>Respaldo actual</p>
+      <aside className={styles.sponsor} aria-label="Visitar Velar Technologies">
+        <p className={styles.sponsorLabel}>Visitar Velar Technologies</p>
         <SponsorLink variant="page" className={styles.sponsorLink} />
       </aside>
     </div>
