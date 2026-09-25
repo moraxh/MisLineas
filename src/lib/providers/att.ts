@@ -24,7 +24,12 @@ function stageLog(label: string, t0: number) {
 // TCP connect and the CONNECT reply, and per-connection timing in the logs.
 const GATEWAY_ATTEMPT_TIMEOUT_MS = 2000;
 const GATEWAY_CONNECT_TIMEOUT_MS = 10000;
-const GATEWAY_REPLY_TIMEOUT_MS = 15000;
+// Production logs show the gateway routinely accepts the TCP connection but
+// never answers the CONNECT (0 bytes read, stuck until this fires) — 11/11
+// attempts across 4 separate lookups. 15s was needlessly generous for that
+// case and, combined with Chromium opening a second connection after the
+// first dies, doubled the cost of every stuck attempt (~30s total per try).
+const GATEWAY_REPLY_TIMEOUT_MS = 6000;
 
 class GatewayAgent extends http.Agent {
   private readonly t0: number;
@@ -94,6 +99,12 @@ async function startGatewayRelay(
   const relay = new Server({
     host: "127.0.0.1",
     port: 0,
+    // proxy-chain swallows upstream-connection errors internally (chain.js
+    // handles client.on('error', ...) itself and never emits 'requestFailed'
+    // for them) — its own console.log via `verbose` is the only way to see
+    // them, which is how we caught the gateway silently sitting on an open
+    // TCP connection without ever answering the CONNECT.
+    verbose: true,
     prepareRequestFunction: () => ({ upstreamProxyUrl, httpAgent }),
   });
   relay.on("requestFailed", ({ error }: { error: Error }) => {
@@ -357,7 +368,11 @@ async function attempt(
   }
 }
 
-const MAX_ATTEMPTS = 3;
+// A stuck gateway attempt now costs ~12s worst case (two 6s CONNECT-reply
+// timeouts, see GATEWAY_REPLY_TIMEOUT_MS above) instead of the previous
+// ~30s, so more attempts fit inside maxDuration=300 for the same budget
+// while giving the rotating gateway more chances to land on a working node.
+const MAX_ATTEMPTS = 5;
 
 export async function lookupCURPInATT(curp: string): Promise<LineResult> {
   // Resolve the executable once — downloading it on every attempt causes ETXTBSY
