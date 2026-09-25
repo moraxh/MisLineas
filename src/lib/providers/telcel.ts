@@ -10,8 +10,14 @@ const BASE_HOST = "registro.telcel.com";
 const LOG_PREFIX = "[telcel]";
 const LOOKUP_MAX_ATTEMPTS = 2;
 const LOOKUP_RETRY_DELAYS_MS = [1000];
-const VALIDATION_MAX_ATTEMPTS = 2;
-const VALIDATION_RETRY_DELAYS_MS = [250];
+// Bumped from 2: registro.telcel.com's own 503s (unrelated to any proxy —
+// reproduced directly, no proxy at all, and across every residential proxy
+// we tried) hit at a ~40-80% rate in bursts, so 2 attempts often weren't
+// enough to land a real response. Cost per extra attempt is tiny (~1-3KB,
+// this is a small JSON POST, not AT&T's full-browser flow), so more
+// attempts just trades a bit of latency for a much higher success rate.
+const VALIDATION_MAX_ATTEMPTS = 4;
+const VALIDATION_RETRY_DELAYS_MS = [250, 500, 750];
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
