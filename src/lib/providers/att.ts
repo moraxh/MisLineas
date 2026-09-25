@@ -1,3 +1,6 @@
+import http from "node:http";
+import net from "node:net";
+import type { Server as ProxyChainServer } from "proxy-chain";
 import { getResidentialProxyUrl } from "@/lib/proxy";
 import type { LineResult } from "@/types";
 
@@ -12,6 +15,94 @@ function stageLog(label: string, t0: number) {
   console.log(`[att] ${label} (+${Date.now() - t0}ms)`);
 }
 
+// Chromium dialing the residential gateway itself stalled on Vercel until its
+// own ~30s connect timeout (net::ERR_TIMED_OUT), while every Node-based
+// provider going through the same gateway worked. Chromium doesn't fail over
+// between the gateway's A records the way Node does, so it now talks to a
+// local, unauthenticated proxy-chain relay and Node dials the gateway:
+// Happy Eyeballs across every resolved address, a hard deadline on both the
+// TCP connect and the CONNECT reply, and per-connection timing in the logs.
+const GATEWAY_ATTEMPT_TIMEOUT_MS = 2000;
+const GATEWAY_CONNECT_TIMEOUT_MS = 10000;
+const GATEWAY_REPLY_TIMEOUT_MS = 15000;
+
+class GatewayAgent extends http.Agent {
+  private readonly t0: number;
+
+  constructor(t0: number) {
+    super({ keepAlive: false });
+    this.t0 = t0;
+  }
+
+  createConnection(options: http.ClientRequestArgs) {
+    const started = Date.now();
+    const target = `${options.host}:${options.port}`;
+    const socket = net.connect({
+      host: options.host ?? undefined,
+      port: Number(options.port),
+      autoSelectFamily: true,
+      autoSelectFamilyAttemptTimeout: GATEWAY_ATTEMPT_TIMEOUT_MS,
+    });
+
+    const connectTimer = setTimeout(() => {
+      socket.destroy(
+        new Error(
+          `gateway TCP connect to ${target} timed out after ${GATEWAY_CONNECT_TIMEOUT_MS}ms`,
+        ),
+      );
+    }, GATEWAY_CONNECT_TIMEOUT_MS);
+
+    socket.once("connect", () => {
+      clearTimeout(connectTimer);
+      stageLog(
+        `gateway TCP connected to ${socket.remoteAddress} in ${Date.now() - started}ms`,
+        this.t0,
+      );
+      // The gateway accepting TCP but never answering the CONNECT is the
+      // other way this can hang, so bound the wait for its first byte too.
+      socket.setTimeout(GATEWAY_REPLY_TIMEOUT_MS);
+    });
+    socket.on("timeout", () => {
+      if (socket.bytesRead === 0) {
+        socket.destroy(
+          new Error(
+            `gateway ${socket.remoteAddress} sent no CONNECT reply within ${GATEWAY_REPLY_TIMEOUT_MS}ms`,
+          ),
+        );
+      } else {
+        socket.setTimeout(0);
+      }
+    });
+    socket.once("error", (err) => {
+      clearTimeout(connectTimer);
+      stageLog(
+        `gateway connection failed after ${Date.now() - started}ms: ${err.message}`,
+        this.t0,
+      );
+    });
+
+    return socket;
+  }
+}
+
+async function startGatewayRelay(
+  upstreamProxyUrl: string,
+  t0: number,
+): Promise<ProxyChainServer> {
+  const { Server } = await import("proxy-chain");
+  const httpAgent = new GatewayAgent(t0);
+  const relay = new Server({
+    host: "127.0.0.1",
+    port: 0,
+    prepareRequestFunction: () => ({ upstreamProxyUrl, httpAgent }),
+  });
+  relay.on("requestFailed", ({ error }: { error: Error }) => {
+    stageLog(`relay request failed: ${error.message}`, t0);
+  });
+  await relay.listen();
+  return relay;
+}
+
 async function attempt(
   curp: string,
   executablePath: string,
@@ -22,7 +113,12 @@ async function attempt(
   stageLog(`proxy ${proxy ? "configured" : "not configured"}`, t0);
   const { default: puppeteer } = await import("puppeteer-core");
 
-  const proxyArg = proxy ? [`--proxy-server=${new URL(proxy).origin}`] : [];
+  const relay = proxy ? await startGatewayRelay(proxy, t0) : null;
+  if (relay) stageLog(`gateway relay listening on :${relay.port}`, t0);
+
+  const proxyArg = relay
+    ? [`--proxy-server=http://127.0.0.1:${relay.port}`]
+    : [];
   const args = [
     "--no-sandbox",
     "--disable-setuid-sandbox",
@@ -33,25 +129,21 @@ async function attempt(
     ...proxyArg,
   ];
 
-  const browser = await puppeteer.launch({
-    executablePath,
-    headless: true,
-    args,
-  });
+  const browser = await puppeteer
+    .launch({
+      executablePath,
+      headless: true,
+      args,
+    })
+    .catch(async (err) => {
+      await relay?.close(true);
+      throw err;
+    });
   stageLog("browser launched", t0);
 
   try {
     const page = await browser.newPage();
     stageLog("page opened", t0);
-
-    if (proxy) {
-      const proxyUrl = new URL(proxy);
-      await page.authenticate({
-        username: decodeURIComponent(proxyUrl.username),
-        password: decodeURIComponent(proxyUrl.password),
-      });
-      stageLog("proxy authenticated", t0);
-    }
 
     await page.setBypassCSP(true);
 
@@ -118,6 +210,36 @@ async function attempt(
         referer: "https://att.com.mx/controlpersonal/",
       };
 
+      // The SPA calls portalAvailability on mount and shows a maintenance
+      // screen when it reports "disabled"; initlines then fails with an
+      // opaque 400 ("Lambda function error: Unhandled"), so check it first.
+      const availabilityRes = await fetch(
+        "/controlpersonal/api/portalavailability",
+        {
+          method: "POST",
+          headers: h,
+          credentials: "include",
+          body: JSON.stringify({
+            operation: "portalAvailability",
+            request: { portal: "consulta" },
+          }),
+        },
+      );
+      if (!availabilityRes.ok) {
+        const body = await availabilityRes.text().catch(() => "");
+        return {
+          error: `portalavailability ${availabilityRes.status}: ${body.slice(0, 200)}`,
+        };
+      }
+      const availability = (await availabilityRes.json()) as {
+        data?: { status?: string; message?: string };
+      };
+      if (availability.data?.status === "disabled") {
+        return {
+          maintenance: availability.data.message ?? "portal disabled",
+        };
+      }
+
       const sessionRes = await fetch("/controlpersonal/api/session/initlines", {
         method: "POST",
         headers: h,
@@ -132,7 +254,12 @@ async function attempt(
         }),
       });
 
-      if (!sessionRes.ok) return { error: `initlines ${sessionRes.status}` };
+      if (!sessionRes.ok) {
+        const body = await sessionRes.text().catch(() => "");
+        return {
+          error: `initlines ${sessionRes.status}: ${body.slice(0, 200)}`,
+        };
+      }
 
       const sessionData = (await sessionRes.json()) as { status: string };
       if (sessionData.status !== "SUCCESS") {
@@ -171,6 +298,16 @@ async function attempt(
       return { data: await validationRes.json() };
     }, curp);
     stageLog("session+validation calls resolved", t0);
+
+    if ("maintenance" in result) {
+      // Not retryable: every attempt would just burn proxy bandwidth.
+      console.warn("AT&T: portal under maintenance:", result.maintenance);
+      return {
+        company: "AT&T",
+        lines: [],
+        error: "AT&T portal is under maintenance",
+      };
+    }
 
     if ("error" in result) {
       console.error("AT&T:", result.error);
@@ -216,6 +353,7 @@ async function attempt(
     return { company: "AT&T", lines: [], isRegistered: false };
   } finally {
     await browser.close();
+    await relay?.close(true);
   }
 }
 
