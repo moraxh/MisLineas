@@ -312,11 +312,13 @@ async function attempt(
 
     if ("maintenance" in result) {
       // Not retryable: every attempt would just burn proxy bandwidth.
+      // temporaryUnavailable (not error) so the frontend shows AT&T as
+      // "Temporalmente no disponible" instead of a generic query error.
       console.warn("AT&T: portal under maintenance:", result.maintenance);
       return {
         company: "AT&T",
         lines: [],
-        error: "AT&T portal is under maintenance",
+        temporaryUnavailable: true,
       };
     }
 
