@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import logo from "@/assets/logo.png";
+import { CreatorsCredit } from "@/components/home/CreatorsCredit";
 import { SponsorLink } from "@/components/home/SponsorLink";
 import styles from "./SiteFooter.module.css";
 
@@ -65,7 +66,9 @@ export function SiteFooter() {
                 </span>
                 <span className={styles.linkCopy}>
                   <span className={styles.linkName}>Contacto</span>
-                  <span className={styles.linkDescription}>
+                  <span
+                    className={`${styles.linkDescription} ${styles.linkEmail}`}
+                  >
                     contact@moraxh.dev
                   </span>
                 </span>
@@ -84,8 +87,14 @@ export function SiteFooter() {
             <HeartHandshake size={16} aria-hidden="true" />
             <span>Apoyar el proyecto</span>
           </a>
-          <SponsorLink variant="footer" className={styles.sponsor} />
+          <SponsorLink
+            variant="footer"
+            className={styles.sponsor}
+            logo="isotype"
+          />
         </div>
+
+        <CreatorsCredit />
       </div>
     </footer>
   );

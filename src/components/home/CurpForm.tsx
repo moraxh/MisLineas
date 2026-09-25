@@ -283,6 +283,18 @@ export function CurpForm({
               </p>
             </div>
           )}
+          {variant !== "pill" && (
+            <p className={styles.poweredBy}>
+              Powered by{" "}
+              <a
+                href="https://velartechnologies.com/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Velar Technologies
+              </a>
+            </p>
+          )}
           {variant !== "pill" && curpHelpLink}
         </div>
 

@@ -233,6 +233,29 @@
   line-height: 1.55;
 }
 
+.poweredBy {
+  margin: -2px 0 0;
+  color: #77848b;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.poweredBy a {
+  color: #52636c;
+  text-decoration: underline;
+  text-decoration-color: #b7c3c8;
+  text-underline-offset: 3px;
+  transition:
+    color 160ms ease,
+    text-decoration-color 160ms ease;
+}
+
+.poweredBy a:hover {
+  color: #087d70;
+  text-decoration-color: currentColor;
+}
+
 .curpHelpLink {
   color: #77848b;
   font-size: 0.78rem;

@@ -32,8 +32,7 @@
 }
 
 .backLink:focus-visible,
-.inlineLink:focus-visible,
-.projectLink:focus-visible {
+.inlineLink:focus-visible {
   border-radius: 4px;
   outline: 2px solid #007aff;
   outline-offset: 4px;
@@ -114,6 +113,7 @@
   display: grid;
   width: min(100%, 900px);
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  align-items: stretch;
   margin: clamp(42px, 7vw, 72px) auto 0;
   overflow: hidden;
   border: 1px solid #dce7eb;
@@ -125,10 +125,8 @@
 .sponsorPanel,
 .projectPanel {
   display: flex;
-  min-height: 250px;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 32px;
+  gap: 20px;
   padding: clamp(24px, 4vw, 34px);
 }
 
@@ -137,6 +135,7 @@
 }
 
 .projectPanel {
+  justify-content: center;
   border-left: 1px solid #dce7eb;
   background: #fff;
 }
@@ -163,8 +162,7 @@
   line-height: 1.65;
 }
 
-.inlineLink,
-.projectLink {
+.inlineLink {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -180,14 +178,9 @@
     translate 180ms ease;
 }
 
-.inlineLink:hover,
-.projectLink:hover {
+.inlineLink:hover {
   color: #1769aa;
   text-decoration-color: currentColor;
-}
-
-.projectLink {
-  width: fit-content;
 }
 
 .inlineIcon {
@@ -196,12 +189,18 @@
 }
 
 .thanks {
+  display: grid;
   max-width: 480px;
   margin: 26px auto 0;
+  gap: 8px;
   color: #89949a;
   font-size: 0.78rem;
   line-height: 1.6;
   text-align: center;
+}
+
+.thanks p {
+  margin: 0;
 }
 
 @media (max-width: 680px) {
@@ -237,8 +236,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .backLink,
-  .inlineLink,
-  .projectLink {
+  .inlineLink {
     transition: none;
   }
 }

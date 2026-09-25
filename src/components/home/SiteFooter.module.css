@@ -146,6 +146,13 @@
   line-height: 1.35;
 }
 
+.linkEmail {
+  overflow: hidden;
+  overflow-wrap: normal;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .linkArrow {
   width: 15px;
   height: 15px;

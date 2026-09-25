@@ -1,5 +1,8 @@
 import { ArrowUpRight, Github } from "lucide-react";
+import Image from "next/image";
 import styles from "./CreatorsCredit.module.css";
+
+const VELAR_URL = "https://velartech.com.mx/";
 
 const creators = [
   { name: "Jorge Mora", handle: "@moraxh", href: "https://github.com/moraxh" },
@@ -30,6 +33,24 @@ export function CreatorsCredit() {
           </a>
         ))}
       </div>
+      <a
+        className={styles.sponsor}
+        href={VELAR_URL}
+        target="_blank"
+        rel="sponsored noopener"
+        referrerPolicy="strict-origin-when-cross-origin"
+        aria-label="Sponsored by Velar Technologies"
+        title="Sponsored by Velar Technologies"
+      >
+        <span className={styles.sponsorLabel}>Sponsored by</span>
+        <Image
+          src="/branding/velar-isotype.png"
+          alt="Velar Technologies"
+          width={32}
+          height={32}
+          className={styles.sponsorIcon}
+        />
+      </a>
     </section>
   );
 }

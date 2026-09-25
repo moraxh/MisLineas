@@ -47,6 +47,35 @@
   outline-offset: 4px;
 }
 
+.sponsor {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: #69777f;
+  text-decoration: none;
+  transition: color 160ms ease;
+}
+
+.sponsor:hover {
+  color: #34434b;
+}
+
+.sponsor:focus-visible {
+  border-radius: 4px;
+  outline: 2px solid #007aff;
+  outline-offset: 4px;
+}
+
+.sponsorLabel {
+  font-size: 0.82rem;
+  font-weight: 590;
+}
+
+.sponsorIcon {
+  width: 20px;
+  height: 20px;
+}
+
 @media (max-width: 560px) {
   .section {
     align-items: flex-start;
@@ -60,7 +89,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .creator {
+  .creator,
+  .sponsor {
     transition: none;
   }
 }

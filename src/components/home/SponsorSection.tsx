@@ -9,9 +9,9 @@ export function SponsorSection() {
           Un proyecto independiente con respaldo técnico.
         </p>
         <p>
-          Velar Technologies es una empresa mexicana de tecnología que integra
-          sistemas y datos empresariales, construye software a la medida y
-          automatiza procesos con inteligencia artificial.
+          Velar Technologies digitaliza los procesos de las empresas, unifica
+          sus sistemas aislados en una operación conectada y les permite tomar
+          decisiones con inteligencia artificial nativa.
         </p>
         <p>
           MisLíneas fue creado originalmente por Jorge Mora y Hadassah García.
@@ -22,7 +22,12 @@ export function SponsorSection() {
       </div>
       <aside className={styles.sponsor} aria-label="Visitar Velar Technologies">
         <p className={styles.sponsorLabel}>Visitar Velar Technologies</p>
-        <SponsorLink variant="page" className={styles.sponsorLink} />
+        <SponsorLink
+          variant="page"
+          className={styles.sponsorLink}
+          hideLabel
+          logo="isotype"
+        />
       </aside>
     </div>
   );

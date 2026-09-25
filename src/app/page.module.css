@@ -40,7 +40,7 @@
   font-size: clamp(3rem, 5.2vw, 4.75rem);
   font-weight: 750;
   letter-spacing: -0.058em;
-  line-height: 1.01;
+  line-height: 1.15;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -74,7 +74,7 @@
   .heroContent h1 {
     font-size: clamp(2.65rem, 10.8vw, 3.5rem);
     letter-spacing: -0.052em;
-    line-height: 1.04;
+    line-height: 1.15;
   }
 
   .heroContent h1 + p {

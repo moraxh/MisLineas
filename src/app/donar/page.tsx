@@ -1,9 +1,7 @@
-import { ArrowLeft, ExternalLink, Github, HeartHandshake } from "lucide-react";
+import { ArrowLeft, Github, HeartHandshake } from "lucide-react";
 import Link from "next/link";
 import { SponsorLink } from "@/components/home/SponsorLink";
 import styles from "./page.module.css";
-
-const VELAR_URL = "https://velartech.com.mx/";
 
 export default function DonarPage() {
   return (
@@ -26,7 +24,7 @@ export default function DonarPage() {
             MisLíneas ya cuenta con respaldo
           </h1>
           <p className={styles.description}>
-            Velar Technologies cubre actualmente todos los gastos de
+            Un patrocinador cubre actualmente todos los gastos de
             infraestructura y mantenimiento del servicio. Por eso, no necesitas
             hacer una donación para que MisLíneas siga disponible de forma
             gratuita.
@@ -66,23 +64,20 @@ export default function DonarPage() {
                 .
               </p>
             </div>
-            <a
-              href={VELAR_URL}
-              target="_blank"
-              rel="sponsored noopener"
-              referrerPolicy="strict-origin-when-cross-origin"
-              className={styles.projectLink}
-            >
-              Conocer a Velar Technologies
-              <ExternalLink className={styles.inlineIcon} aria-hidden="true" />
-            </a>
           </div>
         </section>
 
-        <p className={styles.thanks}>
-          Gracias por usar el servicio y por compartirlo con quien pueda
-          necesitarlo.
-        </p>
+        <div className={styles.thanks}>
+          <p>
+            Antes de este respaldo, MisLíneas se mantuvo gracias a las
+            donaciones y al apoyo de personas de la comunidad. Gracias a cada
+            una de ellas.
+          </p>
+          <p>
+            Gracias por usar el servicio y por compartirlo con quien pueda
+            necesitarlo.
+          </p>
+        </div>
       </main>
     </div>
   );
