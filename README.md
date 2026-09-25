@@ -43,10 +43,9 @@ MisLíneas intenta cerrar ese vacío.
 Actualmente incluye soporte para:
 
 - Telcel
+- AT&T, Unefon y WIM marca digital AT&T
 - operadores sobre Red Altán (~65 marcas)
 - más de 80 OMVs en México
-
-AT&T está deshabilitado por el momento: su verificación requiere un navegador completo detrás de un proxy residencial, lo que representaba ~95% del consumo de ancho de banda del proxy para una sola operadora.
 
 La lista completa y el estado de compatibilidad de cada operador se encuentra en [OPERATORS.md](OPERATORS.md).
 
@@ -60,7 +59,7 @@ Las consultas se ejecutan en paralelo utilizando `Promise.allSettled`, mientras 
 
 ## Infraestructura
 
-El frontend se despliega en Vercel y el backend corre en Docker sobre un servidor propio (Oracle Cloud), comunicándose vía CORS y actualizándose automáticamente con cada nueva versión publicada.
+La aplicación completa (frontend y API) se despliega en Vercel, incluyendo las consultas que requieren un navegador headless (Puppeteer + Chromium serverless).
 
 Velar Technologies cubre actualmente todos los gastos de infraestructura y
 mantenimiento del servicio. MisLíneas sigue siendo gratuito, independiente y
