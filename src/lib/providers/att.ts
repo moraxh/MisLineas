@@ -1,19 +1,11 @@
 import http from "node:http";
 import net from "node:net";
-import { FingerprintGenerator } from "fingerprint-generator";
-import { FingerprintInjector } from "fingerprint-injector";
 import type { Server as ProxyChainServer } from "proxy-chain";
 import { getResidentialProxyUrl } from "@/lib/proxy";
 import type { LineResult } from "@/types";
 
-// A hand-picked UA/headers set drifts out of sync over time (our UA said
-// Chrome/149 while the actual @sparticuz/chromium binary was 153, and
-// navigator.userAgentData.brands was left empty entirely — both readable
-// mismatches a real fingerprint-checking WAF can key on). fingerprint-generator
-// produces a full, internally-consistent set (UA, sec-ch-ua-*, sec-fetch-*,
-// accept-encoding, userAgentData) from real browser data instead, and
-// fingerprint-injector applies all of it in one pass.
-const fingerprintGenerator = new FingerprintGenerator();
+const UA =
+  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36";
 
 // Stage timing: logged (without token/CURP/proxy credentials) so a timeout
 // in production shows which stage actually stalled — browser launch, proxy
@@ -143,6 +135,7 @@ async function attempt(
     "--disable-setuid-sandbox",
     "--window-size=1280,800",
     "--disable-blink-features=AutomationControlled",
+    `--user-agent=${UA}`,
     ...extraArgs,
     ...proxyArg,
   ];
@@ -165,25 +158,6 @@ async function attempt(
 
     await page.setBypassCSP(true);
 
-    // Generate and inject a full, internally-consistent browser fingerprint
-    // (UA, sec-ch-ua-*, sec-fetch-*, accept-encoding, navigator.userAgentData,
-    // canvas/WebGL noise, etc.) in one pass, sourced from real browser data
-    // instead of a hand-picked, easily-drifting UA string.
-    const { fingerprint, headers } = fingerprintGenerator.getFingerprint({
-      browsers: [{ name: "chrome", minVersion: 120 }],
-      operatingSystems: ["linux"],
-      locales: ["es-MX", "es"],
-      devices: ["desktop"],
-    });
-    // fingerprint-injector's Puppeteer Page type comes from the full
-    // "puppeteer" package, which is structurally identical to but not
-    // literally the same type as puppeteer-core's Page.
-    // biome-ignore lint/suspicious/noExplicitAny: see above
-    await new FingerprintInjector().attachFingerprintToPuppeteer(page as any, {
-      fingerprint,
-      headers,
-    });
-
     await page.evaluateOnNewDocument(() => {
       delete Object.getPrototypeOf(navigator).webdriver;
       Object.defineProperty(window, "chrome", {
@@ -191,6 +165,12 @@ async function attempt(
         enumerable: true,
         configurable: false,
         value: { runtime: {} },
+      });
+      Object.defineProperty(navigator, "languages", {
+        get: () => ["es-MX", "es", "en-US", "en"],
+      });
+      Object.defineProperty(navigator, "plugins", {
+        get: () => [1, 2, 3, 4, 5],
       });
     });
 
