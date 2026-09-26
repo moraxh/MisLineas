@@ -51,11 +51,19 @@ const nextConfig: NextConfig = {
       // tracer doesn't follow — only the data_files it can see referenced by
       // path.join() calls get copied, leaving the actual .js/package.json
       // missing at runtime ("Cannot find module 'header-generator'"). Force
-      // the full packages in, not just their data files.
-      "./node_modules/fingerprint-generator/**",
-      "./node_modules/fingerprint-injector/**",
-      "./node_modules/header-generator/**",
-      "./node_modules/generative-bayesian-network/**",
+      // the full packages in, not just their data files — but only the
+      // files actually needed at runtime (.js/.mjs/.json/.zip/LICENSE), not
+      // .d.ts/.map/.tsbuildinfo: a broad "**" here pushed the deployment
+      // over some Vercel output limit and made every deploy fail outright
+      // ("Unexpected error") with no further detail.
+      "./node_modules/fingerprint-generator/**/*.{js,mjs,json,zip}",
+      "./node_modules/fingerprint-generator/package.json",
+      "./node_modules/fingerprint-injector/**/*.{js,mjs,json,zip}",
+      "./node_modules/fingerprint-injector/package.json",
+      "./node_modules/header-generator/**/*.{js,mjs,json,zip}",
+      "./node_modules/header-generator/package.json",
+      "./node_modules/generative-bayesian-network/**/*.{js,mjs,json}",
+      "./node_modules/generative-bayesian-network/package.json",
     ],
   },
   async headers() {
