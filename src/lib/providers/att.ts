@@ -390,11 +390,13 @@ async function attempt(
   }
 }
 
-// A stuck gateway attempt now costs ~12s worst case (two 6s CONNECT-reply
-// timeouts, see GATEWAY_REPLY_TIMEOUT_MS above) instead of the previous
-// ~30s, so more attempts fit inside maxDuration=300 for the same budget
-// while giving the rotating gateway more chances to land on a working node.
-const MAX_ATTEMPTS = 5;
+// Capped at 3 (not higher) so the worst case fits inside route.ts's
+// PROVIDER_TIMEOUT_MS (25s): each attempt costs ~6-8s when AT&T's WAF
+// rejects the request outright, so 5 attempts could run 40s+ and blow past
+// that ceiling — which used to abort the client's *entire* multi-provider
+// stream (QUERY_TIMEOUT_MS * 2 = 30s watchdog), not just AT&T's own card,
+// making the whole tool look broken over one blocked provider.
+const MAX_ATTEMPTS = 3;
 
 export async function lookupCURPInATT(curp: string): Promise<LineResult> {
   // Resolve the executable once — downloading it on every attempt causes ETXTBSY

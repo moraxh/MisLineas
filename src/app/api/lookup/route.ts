@@ -12,6 +12,7 @@ export const maxDuration = 300;
 
 import type { NextRequest } from "next/server";
 import { corsHeaders, corsPreflight } from "@/lib/cors";
+import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import { isLocalLookup } from "@/lib/local-access";
 import {
   lookupCURPINMobig,
@@ -211,10 +212,43 @@ export async function POST(req: NextRequest) {
     async start(controller) {
       const encoder = new TextEncoder();
 
+      // PROVIDER_TIMEOUT_MS is documented as a hard ceiling in content.ts
+      // but was never actually enforced here — a provider whose own retry
+      // loop runs long (AT&T: up to 5 attempts against a WAF that can take
+      // ~8s per attempt to reject, 40s+ worst case) had nothing stopping it
+      // short of the client's whole-request watchdog (QUERY_TIMEOUT_MS * 2,
+      // 30s), which aborts the entire stream — every provider's results,
+      // not just the slow one — turning "AT&T is blocked" into "the whole
+      // tool looks broken". Race each provider against the ceiling so a
+      // slow one reports as its own failed card instead.
+      // Note: this races the timeout against the provider call, it doesn't
+      // cancel it — a provider that blows past PROVIDER_TIMEOUT_MS (e.g.
+      // AT&T mid-retry) keeps running in the background using proxy
+      // bandwidth until it settles on its own. Actually cancelling it would
+      // mean threading an AbortSignal into every provider's fetch/Puppeteer
+      // calls; out of scope here, which only fixes the user-facing hang.
+      const withProviderTimeout = <T>(promise: Promise<T>): Promise<T> =>
+        new Promise((resolve, reject) => {
+          const timer = setTimeout(
+            () => reject(new Error("provider timeout")),
+            PROVIDER_TIMEOUT_MS,
+          );
+          promise.then(
+            (v) => {
+              clearTimeout(timer);
+              resolve(v);
+            },
+            (e) => {
+              clearTimeout(timer);
+              reject(e);
+            },
+          );
+        });
+
       const lookupWithRetry = async (p: (typeof providers)[number]) => {
         for (let attempt = 0; ; attempt += 1) {
           try {
-            const result = await p.lookupFunction(curp);
+            const result = await withProviderTimeout(p.lookupFunction(curp));
             const results = Array.isArray(result) ? result : [result];
 
             // A transient network failure usually comes back as a populated
@@ -231,6 +265,25 @@ export async function POST(req: NextRequest) {
           } catch (error) {
             const message =
               error instanceof Error ? error.message : "Unknown error";
+
+            if (message === "provider timeout") {
+              // Not retryable: the provider already burned its own retry
+              // budget getting here, so trying again would just repeat the
+              // same wait. Surfaced as temporaryUnavailable (not error) so
+              // the frontend shows a "No disponible" card instead of a
+              // generic query error for this one provider.
+              console.warn(`Lookup timed out for ${p.provider}`);
+              return [
+                {
+                  provider: p.provider,
+                  result: {
+                    company: p.provider,
+                    lines: [],
+                    temporaryUnavailable: true,
+                  },
+                },
+              ];
+            }
 
             if (TRANSIENT_ERROR.test(message) && attempt < MAX_RETRIES) {
               await sleep(RETRY_BASE_DELAY_MS * (attempt + 1));
