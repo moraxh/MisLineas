@@ -4,8 +4,23 @@ import type { Server as ProxyChainServer } from "proxy-chain";
 import { getResidentialProxyUrl } from "@/lib/proxy";
 import type { LineResult } from "@/types";
 
-const UA =
-  "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/149.0.0.0 Safari/537.36";
+// Kept in sync with @sparticuz/chromium's actual Chromium major version
+// (`chromium --version` on the bundled binary). A UA claiming a version the
+// Client Hints below don't match, or a missing navigator.userAgentData
+// entirely (headless Chromium's default), is itself a bot signal a
+// fingerprint-aware WAF can key on independent of the Shape JS challenge.
+// fingerprint-generator/fingerprint-injector (Apify's fingerprint-suite)
+// were tried for this instead of hand-picked values, but every combination
+// of serverExternalPackages/outputFileTracingIncludes/Excludes we tried
+// couldn't make Vercel accept the deploy: fingerprint-injector declares
+// fingerprint-generator as its own dependency, so pnpm always nests a
+// second symlink to the same physical package under fingerprint-injector's
+// own node_modules/, and Vercel's deploy step rejects that outright
+// ("The framework produced an invalid deployment package... files in
+// symlinked directories") no matter how the tracing config was adjusted.
+const CHROME_MAJOR = "153";
+const UA = `Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/${CHROME_MAJOR}.0.0.0 Safari/537.36`;
+const SEC_CH_UA = `"Chromium";v="${CHROME_MAJOR}", "Not_A Brand";v="24"`;
 
 // Stage timing: logged (without token/CURP/proxy credentials) so a timeout
 // in production shows which stage actually stalled — browser launch, proxy
@@ -158,7 +173,18 @@ async function attempt(
 
     await page.setBypassCSP(true);
 
-    await page.evaluateOnNewDocument(() => {
+    // navigator.userAgentData.brands is empty in headless Chromium unless
+    // the UA-CH API is fed explicitly — a real Chrome always exposes this,
+    // so its absence (readable via JS, independent of any HTTP header) is
+    // itself a bot signal on top of the missing sec-ch-ua-* headers below.
+    await page.setExtraHTTPHeaders({
+      "accept-language": "es-MX,es;q=0.9,en-US;q=0.8,en;q=0.7",
+      "sec-ch-ua": SEC_CH_UA,
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": '"Linux"',
+    });
+
+    await page.evaluateOnNewDocument((chromeMajor: string) => {
       delete Object.getPrototypeOf(navigator).webdriver;
       Object.defineProperty(window, "chrome", {
         writable: true,
@@ -172,7 +198,25 @@ async function attempt(
       Object.defineProperty(navigator, "plugins", {
         get: () => [1, 2, 3, 4, 5],
       });
-    });
+      const brands = [
+        { brand: "Chromium", version: chromeMajor },
+        { brand: "Not_A Brand", version: "24" },
+      ];
+      Object.defineProperty(navigator, "userAgentData", {
+        get: () => ({
+          brands,
+          mobile: false,
+          platform: "Linux",
+          getHighEntropyValues: () =>
+            Promise.resolve({
+              brands,
+              mobile: false,
+              platform: "Linux",
+              uaFullVersion: `${chromeMajor}.0.0.0`,
+            }),
+        }),
+      });
+    }, CHROME_MAJOR);
 
     await page.setRequestInterception(true);
     page.on("request", (req) => {
