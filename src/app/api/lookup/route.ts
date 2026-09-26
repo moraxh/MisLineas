@@ -30,7 +30,7 @@ import {
   loookupCURPInTalentoNetMVNO,
   loookupCURPInVirginMobile,
 } from "@/lib/providers";
-import { lookupCURPInATT } from "@/lib/providers/att";
+// import { lookupCURPInATT } from "@/lib/providers/att"; // Paused, see below.
 import { validateCURP } from "@/lib/providers/curp";
 import { checkRateLimit } from "@/lib/rate-limit";
 import { stripCURPs } from "@/lib/sanitize";
@@ -59,13 +59,18 @@ const providers: Array<{
   provider: string;
   lookupFunction: (curp: string) => Promise<LineResult | LineResult[]>;
 }> = [
-  {
-    provider: "AT&T",
-    lookupFunction: lookupCURPInATT,
-    // Re-enabled: Velar Technologies' sponsorship now covers the
-    // residential-proxy bandwidth this provider needs (~170-800KB per lookup,
-    // full browser + Shape's common.js on every call, vs ~7-8KB for the rest).
-  },
+  // {
+  //   provider: "AT&T",
+  //   lookupFunction: lookupCURPInATT,
+  //   // Paused: att.com.mx's WAF is rejecting initlines with a 403 ("The
+  //   // requested URL was rejected") on the large majority of attempts,
+  //   // well after Shape's JS challenge already passes and the cookie is
+  //   // valid — not a Client Hints/fingerprint issue (tried, didn't help),
+  //   // most likely IP-based rate limiting on the residential proxy exit.
+  //   // Every attempt still burns a full Chromium launch + proxy bandwidth
+  //   // for a near-certain failure, so disabled until that's root-caused
+  //   // rather than keep showing users a "No disponible" card for it.
+  // },
   {
     provider: "Telcel",
     lookupFunction: lookupCURPInTelcel,
