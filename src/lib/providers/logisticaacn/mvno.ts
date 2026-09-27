@@ -35,7 +35,6 @@ export async function lookupCURPInLogisticaACN(
 
     return {
       company: "Logistica ACN",
-      possibleProviders: possibleProviders,
       lines,
       isRegistered: true,
       rawApiResponse: validationData,

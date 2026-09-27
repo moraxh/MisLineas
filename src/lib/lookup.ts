@@ -88,15 +88,19 @@ export function transformApiResponse(
 
     if (result.isRegistered) {
       if (result.possibleProviders && result.possibleProviders.length > 0) {
-        for (const posible of result.possibleProviders) {
-          lines.push({
-            id: `${provider}-possible-${posible}`,
-            operadora: posible,
-            numero: "Número no confirmado",
-            isPossible: true,
-            disclaimer: result.possibleDisclaimer,
-          });
-        }
+        // The provider confirmed a line exists but can't say which of its
+        // sub-brands owns it. One line was found, so show one card (not one
+        // per candidate brand) listing the candidates in the disclaimer.
+        const candidates = result.possibleProviders.join(", ");
+        lines.push({
+          id: `${provider}-possible-group`,
+          operadora: result.company || provider,
+          numero: "Número no confirmado",
+          isPossible: true,
+          disclaimer: result.possibleDisclaimer
+            ? `${result.possibleDisclaimer} Marcas candidatas: ${candidates}.`
+            : `Marca exacta no confirmada por el operador. Marcas candidatas: ${candidates}.`,
+        });
       } else if (!hasLines) {
         lines.push({
           id: `${provider}-hidden`,
