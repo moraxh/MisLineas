@@ -23,7 +23,7 @@ export async function lookupCURPInABIB(curp: string): Promise<LineResult> {
 
   const validationData = await validationResponse.json();
 
-  if (validationData.status === false) {
+  if (validationData.success === false) {
     return {
       company: "ABIB",
       lines: [],
@@ -31,7 +31,7 @@ export async function lookupCURPInABIB(curp: string): Promise<LineResult> {
     };
   }
 
-  if (validationData.status === true) {
+  if (validationData.success === true) {
     console.log(
       "[abib] registered response:",
       JSON.stringify(stripCURPs(validationData), null, 2),
