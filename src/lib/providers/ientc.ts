@@ -81,14 +81,32 @@ export async function lookupCURPInIENTC(curp: string): Promise<LineResult> {
   }
 
   const positiveData = await validationResponse.json().catch(() => null);
-  console.log(
-    "[ientc] registered response:",
+
+  // A 200/ok response only means registered if the body actually contains a
+  // non-empty list of phones. Requiring this positive evidence (instead of
+  // trusting any non-404 status) avoids silently reporting a registration if
+  // the API ever returns 200 with an empty or unrecognized body.
+  const phones = positiveData?.data ?? positiveData?.phones;
+  if (Array.isArray(phones) && phones.length > 0) {
+    console.log(
+      "[ientc] registered response:",
+      JSON.stringify(stripCURPs(positiveData), null, 2),
+    );
+    return {
+      company: "IENTC",
+      lines: [],
+      isRegistered: true,
+      rawApiResponse: positiveData,
+    };
+  }
+
+  console.error(
+    "[ientc] unrecognized response shape, refusing to guess:",
     JSON.stringify(stripCURPs(positiveData), null, 2),
   );
   return {
     company: "IENTC",
     lines: [],
-    isRegistered: true,
-    rawApiResponse: positiveData,
+    error: "Unrecognized response shape from IENTC",
   };
 }

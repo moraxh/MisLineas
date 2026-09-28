@@ -32,14 +32,31 @@ export async function lookupCURPInBeneleit(curp: string): Promise<LineResult> {
   }
 
   const positiveData = await validationResponse.json().catch(() => null);
-  console.log(
-    "[beneleit] registered response:",
+
+  // A 200/ok response only means registered if `data` is actually a non-empty
+  // array of lines. Requiring this positive evidence (instead of trusting any
+  // non-404 status) avoids silently reporting a registration if the API ever
+  // returns 200 with an empty or unrecognized body.
+  if (Array.isArray(positiveData?.data) && positiveData.data.length > 0) {
+    console.log(
+      "[beneleit] registered response:",
+      JSON.stringify(stripCURPs(positiveData), null, 2),
+    );
+    return {
+      company: "Beneleit Móvil",
+      lines: [],
+      isRegistered: true,
+      rawApiResponse: positiveData,
+    };
+  }
+
+  console.error(
+    "[beneleit] unrecognized response shape, refusing to guess:",
     JSON.stringify(stripCURPs(positiveData), null, 2),
   );
   return {
     company: "Beneleit Móvil",
     lines: [],
-    isRegistered: true,
-    rawApiResponse: positiveData,
+    error: "Unrecognized response shape from Beneleit",
   };
 }

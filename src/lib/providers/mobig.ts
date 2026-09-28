@@ -110,25 +110,43 @@ export async function lookupCURPINMobig(curp: string): Promise<LineResult> {
     };
   }
 
-  // Mobig has flip-flopped between `data.data` being `[]` directly and
-  // `{ last_digits, msisdns }` with `msisdns` being the empty array — accept both shapes.
-  const msisdns = Array.isArray(data?.data) ? data.data : data?.data?.msisdns;
-  if (Array.isArray(msisdns) && msisdns.length === 0) {
+  // Mobig has repeatedly changed the shape of `data.data` (bare `[]`, `{ msisdns }`,
+  // `{ last_digits }`, ...). Rather than keep whitelisting "empty" shapes and treating
+  // anything unrecognized as a registration (which silently produced false positives
+  // every time the API changed), we require positive evidence of a match: only a
+  // known field that is a NON-empty array counts as registered. A known field that is
+  // an empty array means not registered. Anything else is an unrecognized shape and
+  // is reported as an error, never guessed as registered.
+  const linesField = data?.data?.msisdns ?? data?.data?.last_digits ?? data?.data;
+
+  if (Array.isArray(linesField)) {
+    if (linesField.length === 0) {
+      return {
+        company: "Mobig",
+        lines: [],
+        isRegistered: false,
+      };
+    }
+
+    console.log(
+      "[mobig] registered response:",
+      JSON.stringify(stripCURPs(data), null, 2),
+    );
     return {
       company: "Mobig",
       lines: [],
-      isRegistered: false,
+      isRegistered: true,
+      rawApiResponse: data,
     };
   }
 
-  console.log(
-    "[mobig] registered response:",
+  console.error(
+    "[mobig] unrecognized response shape, refusing to guess:",
     JSON.stringify(stripCURPs(data), null, 2),
   );
   return {
     company: "Mobig",
     lines: [],
-    isRegistered: true,
-    rawApiResponse: data,
+    error: "Unrecognized response shape from Mobig",
   };
 }

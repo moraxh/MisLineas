@@ -23,11 +23,7 @@ export async function lookupCURPInMirlo(curp: string): Promise<LineResult> {
 
   const validationData = await validationResponse.json();
 
-  if (
-    validationData.status === 404 &&
-    validationData.message ===
-      "No se encontró titular con el CURP proporcionado"
-  ) {
+  if (validationData?.status === 404) {
     return {
       company: "Mirlo",
       lines: [],
@@ -35,14 +31,29 @@ export async function lookupCURPInMirlo(curp: string): Promise<LineResult> {
     };
   }
 
-  console.log(
-    "[mirlo] registered response:",
+  // Only a 200 with an explicit success status counts as registered. Any
+  // other shape (including a 200 with an unrecognized body) is reported as an
+  // error instead of being guessed as a registration.
+  if (validationData?.status === 200) {
+    console.log(
+      "[mirlo] registered response:",
+      JSON.stringify(stripCURPs(validationData), null, 2),
+    );
+    return {
+      company: "Mirlo",
+      lines: [],
+      isRegistered: true,
+      rawApiResponse: validationData,
+    };
+  }
+
+  console.error(
+    "[mirlo] unrecognized response shape, refusing to guess:",
     JSON.stringify(stripCURPs(validationData), null, 2),
   );
   return {
     company: "Mirlo",
     lines: [],
-    isRegistered: true,
-    rawApiResponse: validationData,
+    error: "Unrecognized response shape from Mirlo",
   };
 }

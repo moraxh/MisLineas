@@ -23,7 +23,7 @@ export async function lookupCURPInABIB(curp: string): Promise<LineResult> {
 
   const validationData = await validationResponse.json();
 
-  if (!validationData.status) {
+  if (validationData.status === false) {
     return {
       company: "ABIB",
       lines: [],
@@ -31,14 +31,26 @@ export async function lookupCURPInABIB(curp: string): Promise<LineResult> {
     };
   }
 
-  console.log(
-    "[abib] registered response:",
+  if (validationData.status === true) {
+    console.log(
+      "[abib] registered response:",
+      JSON.stringify(stripCURPs(validationData), null, 2),
+    );
+    return {
+      company: "ABIB",
+      lines: [],
+      isRegistered: true,
+      rawApiResponse: validationData,
+    };
+  }
+
+  console.error(
+    "[abib] unrecognized response shape, refusing to guess:",
     JSON.stringify(stripCURPs(validationData), null, 2),
   );
   return {
     company: "ABIB",
     lines: [],
-    isRegistered: true,
-    rawApiResponse: validationData,
+    error: "Unrecognized response shape from ABIB",
   };
 }

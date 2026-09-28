@@ -35,8 +35,21 @@ export async function loookupCURPInVirginMobile(
   }
 
   const validationData = await validationResponse.json();
+  const totalLineas = validationData?.data?.total_lineas;
 
-  if (validationData.data.total_lineas === 0) {
+  if (typeof totalLineas !== "number") {
+    console.error(
+      "[virgin-mobile] unrecognized response shape, refusing to guess:",
+      JSON.stringify(validationData, null, 2),
+    );
+    return {
+      company: "Virgin Mobile",
+      lines: [],
+      error: "Unrecognized response shape from Virgin Mobile",
+    };
+  }
+
+  if (totalLineas === 0) {
     return {
       company: "Virgin Mobile",
       lines: [],
