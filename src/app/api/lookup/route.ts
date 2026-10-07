@@ -16,7 +16,6 @@ import { PROVIDER_TIMEOUT_MS } from "@/lib/data/content";
 import { isLocalLookup } from "@/lib/local-access";
 import {
   lookupCURPINMobig,
-  lookupCURPInABIB,
   lookupCURPInAltanMVNO,
   lookupCURPInBeneleit,
   lookupCURPInDialo,
@@ -79,10 +78,13 @@ const providers: Array<{
     provider: "Altan MVNO",
     lookupFunction: lookupCURPInAltanMVNO,
   },
-  {
-    provider: "ABIB",
-    lookupFunction: lookupCURPInABIB,
-  },
+  // {
+  //   provider: "ABIB",
+  //   lookupFunction: lookupCURPInABIB,
+  //   // Disabled: erp.abib.com.mx/api/lineas now requires authentication
+  //   // (302 to /login, 401 "Unauthenticated." with Accept: application/json),
+  //   // so every lookup failed with a JSON parse error on the HTML login page.
+  // },
   {
     provider: "Beneleit Móvil",
     lookupFunction: lookupCURPInBeneleit,

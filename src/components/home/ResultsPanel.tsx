@@ -75,6 +75,8 @@ export function ResultsPanel({
   const notFoundLines = results.filter((line) => line.isNotFound);
   const riskLevel = getRiskLevel(results);
   const detectedCount = confirmedLines.length + possibleLines.length;
+  const scannedBrandsCount = new Set(results.map((line) => line.operadora))
+    .size;
 
   const filterTabs: { key: FilterTab; label: string; count: number }[] = [
     { key: "all", label: "Todas", count: results.length },
@@ -123,6 +125,11 @@ export function ResultsPanel({
         : "Requieren revisión";
   const unavailableOperators = OPERATORS.filter(
     (operator) => getOperatorDisplayStatus(operator) !== "supported",
+  );
+  // Brands users most often expect to see but that are not queried; the
+  // notice names them up front so a missing line is not read as "not registered".
+  const uncoveredPopularBrands = unavailableOperators.filter((operator) =>
+    /AT&T|Bait|Movistar/i.test(operator.name),
   );
   const exportEnabled = !loading && Boolean(queryTime);
 
@@ -361,10 +368,10 @@ export function ResultsPanel({
           <div className={styles.summaryStat}>
             <span className={styles.summaryLabel}>Operadoras</span>
             <span className={styles.summaryValue}>
-              {scannedCount || TOTAL_PROVIDERS}
+              {loading ? scannedCount : scannedBrandsCount}
             </span>
             <span className={styles.summaryHint}>
-              {loading ? "revisadas hasta ahora" : "consultadas en total"}
+              {loading ? "fuentes revisadas hasta ahora" : "marcas consultadas"}
             </span>
           </div>
         </div>
@@ -395,6 +402,18 @@ export function ResultsPanel({
             </p>
           </div>
         )}
+
+      {!loading && uncoveredPopularBrands.length > 0 && (
+        <div className={styles.contextNotice} role="note">
+          <AlertCircle size={18} aria-hidden="true" />
+          <p>
+            Este resultado no cubre AT&T, Unefon, Bait ni Movistar, porque hoy
+            no podemos consultarlas. Si tu línea es de alguna de ellas, que no
+            aparezca aquí no significa que no esté registrada: verifícalo
+            directamente con tu operadora.
+          </p>
+        </div>
+      )}
 
       <section className={styles.controls} aria-label="Filtrar resultados">
         <div className={styles.controlsTop}>

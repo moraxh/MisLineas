@@ -14,7 +14,12 @@ export const ARCO_RIGHTS = [
   },
 ];
 
-export const TOTAL_PROVIDERS = 104;
+// Must match the number of NDJSON rows /api/lookup actually streams: one per
+// entry in route.ts's `providers` array, except Freedompop which expands to
+// one row per brand in FREEDOMPOP_PROVIDERS (7). Currently 12 single-row
+// providers + 7 Freedompop rows = 19. Update this whenever `providers` in
+// route.ts changes (enabling/disabling a carrier, adding a multi-brand one).
+export const TOTAL_PROVIDERS = 19;
 export const TOTAL_QUERIES = 250000;
 export const QUERY_TIMEOUT_MS = 15000;
 

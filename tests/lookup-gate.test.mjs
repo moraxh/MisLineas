@@ -7,6 +7,7 @@ function loadRoute(verification, local = false) {
   let providerCalls = 0;
   let verifiedToken;
   const mocks = {
+    "@/lib/data/content": { PROVIDER_TIMEOUT_MS: 1000 },
     "@/lib/local-access": { isLocalLookup: () => local },
     "@/lib/providers/att": {
       lookupCURPInATT: async () => {
@@ -122,4 +123,17 @@ test("local request includes AT&T without contacting Turnstile", async () => {
     .map((line) => JSON.parse(line));
   assert.ok(lines.some((line) => line.provider === "AT&T"));
   assert.equal(route.token(), undefined);
+});
+
+test("ABIB is not queried while its API requires authentication", async () => {
+  const route = loadRoute({ success: true });
+  const response = await route.POST(
+    request(JSON.stringify({ curp: "synthetic", turnstileToken: "token" })),
+  );
+  const providers = (await response.text())
+    .trim()
+    .split("\n")
+    .map((line) => JSON.parse(line).provider);
+  assert.ok(providers.length > 0);
+  assert.ok(!providers.includes("ABIB"));
 });

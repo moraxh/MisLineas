@@ -33,14 +33,26 @@ export function getOperatorDisplayStatus(
 export const OPERATORS: OperatorEntry[] = [
   { name: "2y2x", status: "supported" },
   { name: "Abafon", status: "supported" },
-  { name: "Abib", status: "supported" },
+  {
+    name: "Abib",
+    status: "paused",
+    reason: "Su consulta ahora exige inicio de sesión.",
+  },
   { name: "Abix", status: "supported" },
   { name: "Addinteli", status: "supported" },
   { name: "AhorroCel", status: "supported" },
   { name: "AI Telecomm", status: "supported" },
   { name: "ALLCE", status: "supported" },
-  { name: "AT&T / Unefon / WIM", status: "paused" },
-  { name: "Bait", status: "supported" },
+  {
+    name: "AT&T / Unefon / WIM",
+    status: "paused",
+    reason: "La consulta de AT&T está en pausa por bloqueos de su portal.",
+  },
+  {
+    name: "Bait",
+    status: "paused",
+    reason: "Es una marca de AT&T, cuya consulta está en pausa.",
+  },
   { name: "Beneleit Móvil", status: "supported" },
   {
     name: "Bestel",
