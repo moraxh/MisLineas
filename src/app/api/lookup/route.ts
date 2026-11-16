@@ -24,6 +24,7 @@ import {
   lookupCURPInMirlo,
   lookupCURPInSorcel,
   lookupCURPInTelcel,
+  lookupCURPInViasat,
   loookupCURPINWeeex,
   loookupCURPInTalentoNetMVNO,
   loookupCURPInVirginMobile,
@@ -138,6 +139,10 @@ const providers: Array<{
   {
     provider: "Weex",
     lookupFunction: loookupCURPINWeeex,
+  },
+  {
+    provider: "Viasat",
+    lookupFunction: lookupCURPInViasat,
   },
   {
     provider: "Freedompop",
