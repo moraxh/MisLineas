@@ -24,27 +24,40 @@ function resolveBinary(): string {
   );
 }
 
+const MAX_ATTEMPTS = 3;
+const CLOUDFLARE_BLOCK =
+  /Attention Required! \| Cloudflare|Just a moment\.\.\./;
+
 export async function lookupCURPInSorcel(curp: string): Promise<LineResult> {
   try {
-    const proxyUrl = getResidentialProxyUrl();
-    const proxyArgs = proxyUrl ? ["--proxy", proxyUrl] : [];
+    // Cloudflare blocks some residential exit IPs ("Attention Required").
+    // Every attempt picks a new random proxy, so retrying usually lands on a
+    // clean exit instead of failing the whole card.
+    let stdout = "";
+    for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+      const proxyUrl = getResidentialProxyUrl();
+      const proxyArgs = proxyUrl ? ["--proxy", proxyUrl] : [];
 
-    const { stdout } = await execFileAsync(
-      resolveBinary(),
-      [
-        "-s",
-        "-X",
-        "POST",
-        "-F",
-        `curpa=${curp}`,
-        "--compressed",
-        "--max-time",
-        String(Math.ceil(PROVIDER_TIMEOUT_MS / 1000)),
-        ...proxyArgs,
-        "https://www.soriup.mx/consultaR.asp",
-      ],
-      { timeout: PROVIDER_TIMEOUT_MS },
-    );
+      ({ stdout } = await execFileAsync(
+        resolveBinary(),
+        [
+          "-s",
+          "-X",
+          "POST",
+          "-F",
+          `curpa=${curp}`,
+          "--compressed",
+          "--max-time",
+          String(Math.ceil(PROVIDER_TIMEOUT_MS / 1000)),
+          ...proxyArgs,
+          "https://www.soriup.mx/consultaR.asp",
+        ],
+        { timeout: PROVIDER_TIMEOUT_MS },
+      ));
+
+      if (!CLOUDFLARE_BLOCK.test(stdout)) break;
+      console.warn(`[sorcel] Cloudflare block on attempt ${attempt}`);
+    }
 
     if (stdout.includes("No hay registros para esa RFC/CURP")) {
       return {
