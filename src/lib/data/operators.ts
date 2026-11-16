@@ -64,7 +64,8 @@ export const OPERATORS: OperatorEntry[] = [
   {
     name: "AT&T / Unefon / WIM",
     status: "paused",
-    reason: "El portal de AT&T responde lo mismo para cualquier CURP, por eso la consulta está en pausa.",
+    reason:
+      "El portal de AT&T responde lo mismo para cualquier CURP, por eso la consulta está en pausa.",
   },
   {
     name: "Bait",
