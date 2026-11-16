@@ -18,7 +18,6 @@ import {
   lookupCURPINMobig,
   lookupCURPInAltanMVNO,
   lookupCURPInBeneleit,
-  lookupCURPInDialo,
   lookupCURPInFreedompop,
   lookupCURPInIENTC,
   lookupCURPInLogisticaACN,
@@ -89,10 +88,14 @@ const providers: Array<{
     provider: "Beneleit Móvil",
     lookupFunction: lookupCURPInBeneleit,
   },
-  {
-    provider: "Dialo",
-    lookupFunction: lookupCURPInDialo,
-  },
+  // {
+  //   provider: "Dialo",
+  //   lookupFunction: lookupCURPInDialo,
+  //   // Disabled: the API Gateway host it queried
+  //   // (p737drx1pj.execute-api.us-east-1.amazonaws.com) no longer resolves
+  //   // (ENOTFOUND, also from public resolvers), so every lookup failed.
+  //   // Needs Dialo's new endpoint before it can be re-enabled.
+  // },
   {
     provider: "IENTC",
     lookupFunction: lookupCURPInIENTC,
