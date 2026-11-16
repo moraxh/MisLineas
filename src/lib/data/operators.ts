@@ -188,6 +188,7 @@ export const OPERATORS: OperatorEntry[] = [
   { name: "Vasanta", status: "supported" },
   { name: "Viral Cel", status: "paused", reason: "Requiere inicio de sesión." },
   { name: "Viasat", status: "supported" },
+  { name: "Vinoc", status: "supported" },
   { name: "Virgin Mobile", status: "supported" },
   { name: "VivaMX", status: "supported" },
   { name: "Weex", status: "supported" },
