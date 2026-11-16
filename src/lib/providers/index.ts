@@ -14,6 +14,7 @@ export * from "./nextor-movil";
 export * from "./sorcel";
 export * from "./talentonet/mvno";
 export * from "./telcel";
+export * from "./viasat";
 export * from "./virgin-mobile";
 export * from "./weex";
 export * from "./yo-mobile";
