@@ -108,7 +108,7 @@ test("successful verification preserves NDJSON streaming with mocked providers",
   for (const line of lines) assert.ok(JSON.parse(line).provider);
 });
 
-test("local request includes AT&T without contacting Turnstile", async () => {
+test("local request skips Turnstile and does not query paused AT&T", async () => {
   const route = loadRoute(
     { success: false, status: 503, error: "no keys" },
     true,
@@ -121,7 +121,8 @@ test("local request includes AT&T without contacting Turnstile", async () => {
     .trim()
     .split("\n")
     .map((line) => JSON.parse(line));
-  assert.ok(lines.some((line) => line.provider === "AT&T"));
+  assert.ok(lines.length > 0);
+  assert.ok(!lines.some((line) => line.provider === "AT&T"));
   assert.equal(route.token(), undefined);
 });
 
