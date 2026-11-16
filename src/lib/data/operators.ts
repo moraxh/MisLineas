@@ -74,7 +74,11 @@ export const OPERATORS: OperatorEntry[] = [
     status: "paused",
     reason: "Recaptcha bloquea peticiones desde servidor.",
   },
-  { name: "Dialo", status: "supported" },
+  {
+    name: "Dialo",
+    status: "paused",
+    reason: "Su servicio de consulta dejó de responder.",
+  },
   { name: "Diri Móvil", status: "supported" },
   { name: "Dua", status: "supported" },
   { name: "ENI Networks", status: "supported" },
