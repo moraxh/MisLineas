@@ -62,14 +62,12 @@ const providers: Array<{
   // {
   //   provider: "AT&T",
   //   lookupFunction: lookupCURPInATT,
-  //   // Paused: att.com.mx's WAF is rejecting initlines with a 403 ("The
-  //   // requested URL was rejected") on the large majority of attempts,
-  //   // well after Shape's JS challenge already passes and the cookie is
-  //   // valid — not a Client Hints/fingerprint issue (tried, didn't help),
-  //   // most likely IP-based rate limiting on the residential proxy exit.
-  //   // Every attempt still burns a full Chromium launch + proxy bandwidth
-  //   // for a near-certain failure, so disabled until that's root-caused
-  //   // rather than keep showing users a "No disponible" card for it.
+  //   // Paused. Checked 2026-11-16: att.com.mx/controlpersonal's validatecustomer
+  //   // returns the same canned answer (fixed uuid, 2 lines ending in 4321)
+  //   // for ANY input (empty, "abc", fake CURPs), even from a real Chrome on
+  //   // a residential IP and with a plain curl session. Enabling it would show
+  //   // every user two fake lines. Earlier 403s from the WAF were a separate
+  //   // problem. Re-enable only once the endpoint answers per-CURP again.
   // },
   {
     provider: "Telcel",
